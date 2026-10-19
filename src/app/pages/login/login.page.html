@@ -1,0 +1,54 @@
+<ion-content class="login-content" [fullscreen]="true">
+  <div class="login-wrapper">
+    <div class="login-card">
+      <div class="login-brand">
+        <div class="brand-logo">
+          <ion-icon name="water-outline"></ion-icon>
+        </div>
+        <h1>Hidromemoria</h1>
+        <p class="brand-tagline">Reportá y seguí inundaciones en tu zona</p>
+      </div>
+
+      <h2 class="login-title">Iniciar sesión</h2>
+
+      <form [formGroup]="form" (ngSubmit)="submit()">
+        <ion-item>
+          <ion-label position="stacked">Email</ion-label>
+          <ion-input type="email" formControlName="email" autocomplete="email" inputmode="email"></ion-input>
+        </ion-item>
+
+        <ion-item lines="none">
+          <ion-label position="stacked">Contraseña</ion-label>
+          <ion-input type="password" formControlName="password" autocomplete="current-password"></ion-input>
+        </ion-item>
+
+        <ion-button expand="block" type="submit" class="submit-btn" [disabled]="loading">
+          <ion-spinner *ngIf="loading" name="dots"></ion-spinner>
+          <span *ngIf="!loading">Iniciar sesión</span>
+        </ion-button>
+      </form>
+
+      <div class="divider">
+        <span>O</span>
+      </div>
+
+      <div class="google-section">
+        <div #googleButton class="google-button-container" *ngIf="googleConfigured"></div>
+        <p class="google-disabled-note" *ngIf="!googleConfigured">
+          El login con Google todavía no está configurado en este entorno.
+        </p>
+      </div>
+        <div class="guest-section">
+          <ion-button expand="block" fill="outline" routerLink="/map">
+          <ion-icon name="map-outline" slot="start"></ion-icon>
+              Ver mapa sin iniciar sesión
+          </ion-button>
+        </div>
+    
+        <div class="register-section">
+          <p>¿Todavía no tenés una cuenta?</p>
+          <a routerLink="/register">Crear cuenta</a>
+        </div>
+    </div>
+  </div>
+</ion-content>

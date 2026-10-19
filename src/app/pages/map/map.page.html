@@ -1,0 +1,74 @@
+<ion-content [fullscreen]="true">
+  <div id="flood-map" class="map-container"></div>
+
+  <!-- Barra flotante estilo Google Maps: menú + buscador + refrescar, todo
+       en una sola píldora blanca sobre el mapa (sin ion-header sólido). -->
+  <div class="map-topbar">
+    <ion-menu-button class="topbar-icon"></ion-menu-button>
+
+    <ion-searchbar
+      [formControl]="searchControl"
+      placeholder="Buscar una calle o dirección..."
+      debounce="0"
+      (ionClear)="clearSearch()"
+      class="topbar-search"
+    ></ion-searchbar>
+
+    <ion-button fill="clear" class="topbar-icon" (click)="refreshReports()">
+      <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
+    </ion-button>
+  </div>
+
+  <ion-list *ngIf="showSearchResults" class="search-results" lines="full">
+    <ion-item *ngFor="let result of searchResults" button (click)="selectSearchResult(result)">
+      <ion-icon slot="start" name="location-outline"></ion-icon>
+      <ion-label class="ion-text-wrap">{{ result.displayName }}</ion-label>
+    </ion-item>
+  </ion-list>
+
+  <div class="loading-overlay" *ngIf="loading">
+    <ion-spinner name="crescent"></ion-spinner>
+  </div>
+
+  <!-- Botón de reportar: solo ícono ("mini logo"), sin texto permanente.
+       Al mantenerlo presionado (mousedown/touchstart) aparece una etiqueta
+       arriba diciendo qué hace, antes de soltar y confirmar la acción. -->
+  <div class="fab-wrapper fab-wrapper--end">
+    <span class="fab-tooltip" *ngIf="pressedButton === 'report'">
+      {{ selectingLocation ? 'Tocá el mapa' : 'Reportar inundación' }}
+    </span>
+    <ion-button
+      class="icon-fab"
+      shape="round"
+      [color]="selectingLocation ? 'warning' : 'primary'"
+      [attr.aria-label]="selectingLocation ? 'Tocá el mapa' : 'Reportar inundación'"
+      (click)="toggleSelectLocation()"
+      (mousedown)="pressedButton = 'report'"
+      (touchstart)="pressedButton = 'report'"
+      (mouseup)="pressedButton = null"
+      (touchend)="pressedButton = null"
+      (mouseleave)="pressedButton = null"
+    >
+      <ion-icon slot="icon-only" [name]="selectingLocation ? 'close-outline' : 'water-outline'"></ion-icon>
+    </ion-button>
+  </div>
+
+  <!-- Botón de ubicación: mismo tratamiento. -->
+  <div class="fab-wrapper fab-wrapper--start">
+    <span class="fab-tooltip" *ngIf="pressedButton === 'locate'">Mi ubicación</span>
+    <ion-button
+      class="icon-fab"
+      shape="round"
+      color="light"
+      aria-label="Mi ubicación"
+      (click)="centerOnUser()"
+      (mousedown)="pressedButton = 'locate'"
+      (touchstart)="pressedButton = 'locate'"
+      (mouseup)="pressedButton = null"
+      (touchend)="pressedButton = null"
+      (mouseleave)="pressedButton = null"
+    >
+      <ion-icon slot="icon-only" name="locate-outline"></ion-icon>
+    </ion-button>
+  </div>
+</ion-content>

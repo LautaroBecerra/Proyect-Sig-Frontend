@@ -1,0 +1,47 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/settings"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Mapa</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <ion-label>Mostrar mi ubicación</ion-label>
+      <ion-toggle
+        slot="end"
+        [checked]="settingsState.mapSettings.showMyLocation"
+        (ionChange)="toggle('showMyLocation')"
+      ></ion-toggle>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-label>Mostrar reportes cercanos</ion-label>
+      <ion-toggle
+        slot="end"
+        [checked]="settingsState.mapSettings.showNearbyReports"
+        (ionChange)="toggle('showNearbyReports')"
+      ></ion-toggle>
+    </ion-item>
+
+    <ion-item lines="none" class="radius-item">
+      <ion-label position="stacked">Radio de búsqueda</ion-label>
+      <ion-segment
+        [value]="settingsState.mapSettings.searchRadiusKm"
+        (ionChange)="setSearchRadius($any($event.detail.value))"
+      >
+        <ion-segment-button [value]="1">
+          <ion-label>1 km</ion-label>
+        </ion-segment-button>
+        <ion-segment-button [value]="5">
+          <ion-label>5 km</ion-label>
+        </ion-segment-button>
+        <ion-segment-button [value]="10">
+          <ion-label>10 km</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+    </ion-item>
+  </ion-list>
+</ion-content>

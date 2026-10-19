@@ -1,0 +1,7 @@
+{
+  "name": "proyect-sig-frontend",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

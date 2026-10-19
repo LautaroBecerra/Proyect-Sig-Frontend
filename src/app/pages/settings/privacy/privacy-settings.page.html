@@ -1,0 +1,35 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/settings"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Privacidad</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-list>
+    <ion-item>
+      <ion-label>Compartir ubicación</ion-label>
+      <ion-toggle
+        slot="end"
+        [checked]="settingsState.privacy.shareLocation"
+        (ionChange)="toggle('shareLocation')"
+      ></ion-toggle>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-label>Otros usuarios ven mis reportes</ion-label>
+      <ion-toggle
+        slot="end"
+        [checked]="settingsState.privacy.allowOthersToSeeMyReports"
+        (ionChange)="toggle('allowOthersToSeeMyReports')"
+      ></ion-toggle>
+    </ion-item>
+  </ion-list>
+
+  <div class="section-actions">
+    <ion-button expand="block" fill="outline" color="danger" (click)="confirmDeleteHistory()">
+      Eliminar historial de reportes
+    </ion-button>
+  </div>
+</ion-content>

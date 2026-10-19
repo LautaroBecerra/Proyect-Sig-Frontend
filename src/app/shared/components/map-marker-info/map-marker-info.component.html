@@ -1,0 +1,32 @@
+<div class="sheet">
+  <div class="sheet-handle"></div>
+
+  <div class="sheet-header">
+    <div class="severity-badge" [attr.data-color]="severityMeta.color">
+      <ion-icon [name]="severityMeta.icon"></ion-icon>
+    </div>
+
+    <div class="sheet-title">
+      <h2>Reporte de inundación</h2>
+      <ion-badge [color]="severityMeta.color">{{ severityMeta.label }}</ion-badge>
+    </div>
+
+    <ion-button fill="clear" class="close-btn" (click)="dismiss()">
+      <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+    </ion-button>
+  </div>
+
+  <p class="description">
+    {{ report.description?.trim() || 'Este reporte no tiene descripción.' }}
+  </p>
+
+  <div class="meta-row">
+    <ion-icon name="time-outline"></ion-icon>
+    <span>{{ formattedDate }}</span>
+  </div>
+
+  <div class="meta-row">
+    <ion-icon name="person-outline"></ion-icon>
+    <span>Reportado por el usuario #{{ report.user_id }}</span>
+  </div>
+</div>

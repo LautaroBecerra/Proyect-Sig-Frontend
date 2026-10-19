@@ -1,0 +1,23 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/settings"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Acerca de</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="about-header">
+    <ion-icon name="water-outline" color="primary"></ion-icon>
+    <h1>{{ appInfo.name }}</h1>
+    <p>Versión {{ appInfo.version }}</p>
+  </div>
+
+  <p class="description">{{ appInfo.description }}</p>
+
+  <ion-list-header>
+    <ion-label>Sobre el proyecto</ion-label>
+  </ion-list-header>
+  <p class="description">{{ appInfo.project }}</p>
+</ion-content>

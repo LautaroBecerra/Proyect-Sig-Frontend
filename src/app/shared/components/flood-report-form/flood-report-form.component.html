@@ -1,0 +1,382 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Nuevo reporte</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="dismiss()">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <form [formGroup]="form">
+    <!-- Tipo de incidente -->
+    <section class="form-section">
+      <h2>Tipo de incidente</h2>
+      <p class="section-hint">Podés elegir más de una opción.</p>
+
+      <div class="chip-grid">
+        <button
+          type="button"
+          *ngFor="let type of incidentTypes"
+          class="chip"
+          [class.selected]="isIncidentSelected(type.key)"
+          (click)="toggleIncidentType(type.key)"
+        >
+          <span class="chip-emoji">{{ type.emoji }}</span>
+          <span>{{ type.label }}</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Rango de tirante -->
+    <section class="form-section">
+      <h2>Rango de tirante</h2>
+      <div class="chip-grid">
+        <button
+          type="button"
+          *ngFor="let range of tirranteRanges"
+          class="chip"
+          [class.selected]="form.get('rangoTirante')?.value === range.key"
+          (click)="setRangoTirante(range.key)"
+        >
+          {{ range.label }}
+        </button>
+      </div>
+    </section>
+
+    <!-- Descripción -->
+    <section class="form-section">
+      <h2>Descripción</h2>
+      <ion-textarea
+        formControlName="descripcion"
+        placeholder="Contanos brevemente qué ocurrió..."
+        [autoGrow]="true"
+        rows="3"
+        class="form-textarea"
+      ></ion-textarea>
+    </section>
+
+    <!-- Seguimiento general -->
+    <section class="form-section">
+      <h2>Respecto al incidente que reportaste</h2>
+      <p class="section-hint">¿El problema sigue presente?</p>
+
+      <div class="choice-group">
+        <button
+          type="button"
+          class="choice-btn"
+          [class.selected]="form.get('problemaPresente')?.value === 'no'"
+          (click)="setProblemaPresente('no')"
+        >
+          Ya no se observa el problema
+        </button>
+        <button
+          type="button"
+          class="choice-btn"
+          [class.selected]="form.get('problemaPresente')?.value === 'si'"
+          (click)="setProblemaPresente('si')"
+        >
+          El problema sigue presente
+        </button>
+      </div>
+    </section>
+
+    <!-- Preguntas condicionales públicas -->
+    <section class="form-section" *ngIf="isIncidentSelected('agua_en_viviendas')">
+      <p class="section-hint">¿Tu vivienda volvió a la normalidad?</p>
+      <div class="choice-group">
+        <button
+          type="button"
+          class="choice-btn"
+          [class.selected]="form.get('seguimiento.aguaViviendaNormalizada')?.value === 'si'"
+          (click)="setSeguimiento('aguaViviendaNormalizada', 'si')"
+        >
+          Sí
+        </button>
+        <button
+          type="button"
+          class="choice-btn"
+          [class.selected]="form.get('seguimiento.aguaViviendaNormalizada')?.value === 'no'"
+          (click)="setSeguimiento('aguaViviendaNormalizada', 'no')"
+        >
+          No
+        </button>
+      </div>
+    </section>
+
+    <section class="form-section" *ngIf="isIncidentSelected('calle_cortada')">
+      <p class="section-hint">¿La calle volvió a ser transitable?</p>
+      <div class="choice-group">
+        <button
+          type="button"
+          class="choice-btn"
+          [class.selected]="form.get('seguimiento.calleTransitable')?.value === 'si'"
+          (click)="setSeguimiento('calleTransitable', 'si')"
+        >
+          Sí
+        </button>
+        <button
+          type="button"
+          class="choice-btn"
+          [class.selected]="form.get('seguimiento.calleTransitable')?.value === 'no'"
+          (click)="setSeguimiento('calleTransitable', 'no')"
+        >
+          No
+        </button>
+      </div>
+    </section>
+
+    <section class="form-section" *ngIf="isIncidentSelected('calle_erosionada')">
+      <p class="section-hint">¿La calle fue reparada?</p>
+      <div class="choice-group">
+        <button
+          type="button"
+          class="choice-btn"
+          [class.selected]="form.get('seguimiento.calleReparada')?.value === 'si'"
+          (click)="setSeguimiento('calleReparada', 'si')"
+        >
+          Sí
+        </button>
+        <button
+          type="button"
+          class="choice-btn"
+          [class.selected]="form.get('seguimiento.calleReparada')?.value === 'no'"
+          (click)="setSeguimiento('calleReparada', 'no')"
+        >
+          No
+        </button>
+      </div>
+    </section>
+
+    <!-- Sección privada -->
+    <section class="private-section">
+      <div class="private-header">
+        <ion-icon name="lock-closed-outline"></ion-icon>
+        <h2>Información adicional — solo para nosotros</h2>
+      </div>
+      <p class="private-hint">
+        Esta información se usa para evaluar el impacto del incidente y no se muestra públicamente
+        junto al reporte en el mapa.
+      </p>
+
+      <!-- Evacuación -->
+      <div class="private-block">
+        <p class="private-question">
+          🚨 ¿Vos o algún integrante de tu familia tuvieron que abandonar su vivienda?
+        </p>
+        <div class="choice-group choice-group--vertical">
+          <button
+            type="button"
+            class="choice-btn"
+            [class.selected]="form.get('privado.evacuacion')?.value === 'no'"
+            (click)="setEvacuacion('no')"
+          >
+            No, no tuvimos que abandonar la vivienda
+          </button>
+          <button
+            type="button"
+            class="choice-btn"
+            [class.selected]="form.get('privado.evacuacion')?.value === 'autoevacuacion'"
+            (click)="setEvacuacion('autoevacuacion')"
+          >
+            Sí, nos autoevacuamos
+          </button>
+          <button
+            type="button"
+            class="choice-btn"
+            [class.selected]="form.get('privado.evacuacion')?.value === 'evacuados_organismo'"
+            (click)="setEvacuacion('evacuados_organismo')"
+          >
+            Sí, fuimos evacuados por bomberos, defensa civil u otro organismo
+          </button>
+        </div>
+
+        <div class="follow-up" *ngIf="form.get('privado.evacuacion')?.value !== 'no'">
+          <p class="section-hint">¿Tu familia regresó a la vivienda?</p>
+          <div class="choice-group">
+            <button
+              type="button"
+              class="choice-btn"
+              [class.selected]="form.get('privado.familiaRegreso')?.value === 'si'"
+              (click)="setFamiliaRegreso('si')"
+            >
+              Sí
+            </button>
+            <button
+              type="button"
+              class="choice-btn"
+              [class.selected]="form.get('privado.familiaRegreso')?.value === 'no'"
+              (click)="setFamiliaRegreso('no')"
+            >
+              No
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Trabajo afectado -->
+      <div class="private-block">
+        <ion-item lines="none" class="private-toggle-item">
+          <ion-label class="ion-text-wrap">💼 Tu trabajo o actividad económica se vio afectada</ion-label>
+          <ion-checkbox slot="end" [checked]="trabajoAfectado" (ionChange)="toggleTrabajoAfectado()"></ion-checkbox>
+        </ion-item>
+
+        <div class="follow-up" *ngIf="trabajoAfectado">
+          <ion-item lines="none">
+            <ion-checkbox
+              slot="start"
+              [checked]="isTrabajoDetalleSelected('actividad_propia')"
+              (ionChange)="toggleTrabajoDetalle('actividad_propia')"
+            ></ion-checkbox>
+            <ion-label class="ion-text-wrap">No pude realizar mi actividad laboral propia</ion-label>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-checkbox
+              slot="start"
+              [checked]="isTrabajoDetalleSelected('no_llego')"
+              (ionChange)="toggleTrabajoDetalle('no_llego')"
+            ></ion-checkbox>
+            <ion-label class="ion-text-wrap">No pude llegar a mi lugar de trabajo</ion-label>
+          </ion-item>
+          <ion-item lines="none">
+            <ion-checkbox
+              slot="start"
+              [checked]="isTrabajoDetalleSelected('perdidas_economicas')"
+              (ionChange)="toggleTrabajoDetalle('perdidas_economicas')"
+            ></ion-checkbox>
+            <ion-label class="ion-text-wrap">Se produjeron pérdidas económicas</ion-label>
+          </ion-item>
+
+          <p class="section-hint">¿Pudiste retomar tu actividad laboral habitual?</p>
+          <div class="choice-group">
+            <button
+              type="button"
+              class="choice-btn"
+              [class.selected]="form.get('privado.actividadRetomada')?.value === 'si'"
+              (click)="setActividadRetomada('si')"
+            >
+              Sí
+            </button>
+            <button
+              type="button"
+              class="choice-btn"
+              [class.selected]="form.get('privado.actividadRetomada')?.value === 'no'"
+              (click)="setActividadRetomada('no')"
+            >
+              No
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Servicios afectados -->
+      <div class="private-block">
+        <p class="private-question">🔌 Servicios afectados</p>
+        <ion-item lines="none">
+          <ion-checkbox
+            slot="start"
+            [checked]="isServicioSelected('sin_luz')"
+            (ionChange)="toggleServicio('sin_luz')"
+          ></ion-checkbox>
+          <ion-label class="ion-text-wrap">Sin energía eléctrica</ion-label>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-checkbox
+            slot="start"
+            [checked]="isServicioSelected('sin_agua')"
+            (ionChange)="toggleServicio('sin_agua')"
+          ></ion-checkbox>
+          <ion-label class="ion-text-wrap">Sin agua potable</ion-label>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-checkbox
+            slot="start"
+            [checked]="isServicioSelected('desborde_cloacal')"
+            (ionChange)="toggleServicio('desborde_cloacal')"
+          ></ion-checkbox>
+          <ion-label class="ion-text-wrap">Desborde cloacal</ion-label>
+        </ion-item>
+      </div>
+
+      <!-- Asistencia necesaria -->
+      <div class="private-block">
+        <p class="private-question">🤝 Necesité asistencia</p>
+        <ion-item lines="none">
+          <ion-checkbox
+            slot="start"
+            [checked]="isAsistenciaSelected('limpieza')"
+            (ionChange)="toggleAsistencia('limpieza')"
+          ></ion-checkbox>
+          <ion-label class="ion-text-wrap">Limpieza y desinfección</ion-label>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-checkbox
+            slot="start"
+            [checked]="isAsistenciaSelected('colchones')"
+            (ionChange)="toggleAsistencia('colchones')"
+          ></ion-checkbox>
+          <ion-label class="ion-text-wrap">Colchones o ropa de cama</ion-label>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-checkbox
+            slot="start"
+            [checked]="isAsistenciaSelected('alimentos')"
+            (ionChange)="toggleAsistencia('alimentos')"
+          ></ion-checkbox>
+          <ion-label class="ion-text-wrap">Alimentos</ion-label>
+        </ion-item>
+        <ion-item lines="none">
+          <ion-checkbox
+            slot="start"
+            [checked]="isAsistenciaSelected('atencion_medica')"
+            (ionChange)="toggleAsistencia('atencion_medica')"
+          ></ion-checkbox>
+          <ion-label class="ion-text-wrap">Atención médica</ion-label>
+        </ion-item>
+      </div>
+    </section>
+
+    <!-- Fotografía -->
+    <section class="form-section">
+      <h2>📷 Adjuntar fotografía (opcional)</h2>
+
+      <input
+        type="file"
+        accept="image/*"
+        id="photo-input"
+        class="photo-input-hidden"
+        (change)="onPhotoSelected($event)"
+      />
+
+      <div class="photo-preview" *ngIf="photoPreviewUrl; else noPhoto">
+        <img [src]="photoPreviewUrl" alt="Vista previa de la fotografía" />
+        <ion-button fill="clear" color="danger" size="small" (click)="removePhoto()">
+          <ion-icon slot="start" name="trash-outline"></ion-icon>
+          Quitar foto
+        </ion-button>
+      </div>
+      <ng-template #noPhoto>
+        <label for="photo-input" class="photo-picker">
+          <ion-icon name="camera-outline"></ion-icon>
+          <span>Elegir una fotografía</span>
+        </label>
+      </ng-template>
+    </section>
+
+    <!-- Nota de contacto -->
+    <p class="contact-note">
+      En caso de querer enviar más información, podés comunicarte a
+      <a [href]="'mailto:' + contactEmail">{{ contactEmail }}</a>.
+    </p>
+
+    <!-- Estado de confirmación -->
+    <p class="confirmation-note">
+      Los reportes quedan en espera de confirmación antes de ser publicados, para evitar que
+      información incorrecta llegue a la comunidad.
+    </p>
+
+    <ion-button expand="block" (click)="submit()">Enviar reporte</ion-button>
+  </form>
+</ion-content>

@@ -1,0 +1,205 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Administración</ion-title>
+    <ion-buttons slot="end">
+      <ion-button
+        aria-label="Actualizar reportes"
+        (click)="loadReports()"
+        [disabled]="loading"
+      >
+        <ion-icon name="refresh-outline" slot="icon-only"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="admin-content">
+  <div class="admin-container">
+    <section class="page-heading">
+      <p class="eyebrow">HIDROMEMORIA</p>
+      <h1>Gestión de reportes</h1>
+      <p>Revisá los avisos de la comunidad y validá su estado.</p>
+    </section>
+
+    <section class="stats-grid">
+      <button
+        type="button"
+        class="stat-card pending"
+        [class.selected]="filter === 'pendiente'"
+        (click)="filter = 'pendiente'"
+      >
+        <span>Pendientes</span>
+        <strong>{{ pendingCount }}</strong>
+      </button>
+
+      <button
+        type="button"
+        class="stat-card approved"
+        [class.selected]="filter === 'aprobado'"
+        (click)="filter = 'aprobado'"
+      >
+        <span>Aprobados</span>
+        <strong>{{ approvedCount }}</strong>
+      </button>
+
+      <button
+        type="button"
+        class="stat-card rejected"
+        [class.selected]="filter === 'rechazado'"
+        (click)="filter = 'rechazado'"
+      >
+        <span>Rechazados</span>
+        <strong>{{ rejectedCount }}</strong>
+      </button>
+    </section>
+
+    <section class="reports-section">
+      <div class="section-heading">
+        <h2>Reportes recibidos</h2>
+
+        <ion-button
+          fill="clear"
+          size="small"
+          (click)="filter = 'todos'"
+          [disabled]="filter === 'todos'"
+        >
+          Ver todos
+        </ion-button>
+      </div>
+
+      <ion-segment
+        [value]="filter"
+        (ionChange)="filter = $any($event).detail.value"
+        scrollable="true"
+      >
+        <ion-segment-button value="pendiente">
+          <ion-label>Pendientes</ion-label>
+        </ion-segment-button>
+
+        <ion-segment-button value="aprobado">
+          <ion-label>Aprobados</ion-label>
+        </ion-segment-button>
+
+        <ion-segment-button value="rechazado">
+          <ion-label>Rechazados</ion-label>
+        </ion-segment-button>
+
+        <ion-segment-button value="todos">
+          <ion-label>Todos</ion-label>
+        </ion-segment-button>
+      </ion-segment>
+
+      <div class="feedback" *ngIf="loading">
+        <ion-spinner name="crescent"></ion-spinner>
+        <p>Cargando reportes...</p>
+      </div>
+
+      <div class="error-box" *ngIf="!loading && errorMessage">
+        <ion-icon name="alert-circle-outline"></ion-icon>
+        <p>{{ errorMessage }}</p>
+        <ion-button size="small" (click)="loadReports()">
+          Reintentar
+        </ion-button>
+      </div>
+
+      <div
+        class="empty-state"
+        *ngIf="!loading && !errorMessage && filteredReports.length === 0"
+      >
+        <ion-icon name="document-text-outline"></ion-icon>
+        <h3>No hay reportes</h3>
+        <p>No encontramos reportes para este filtro.</p>
+      </div>
+
+      <article
+        class="report-card"
+        *ngFor="let report of filteredReports; trackBy: trackById"
+      >
+        <div class="report-top">
+          <div>
+            <span class="report-number">Reporte #{{ report.id }}</span>
+            <p class="report-date">{{ formatDate(report.created_at) }}</p>
+          </div>
+
+          <span
+            class="status-badge"
+            [ngClass]="report.status"
+          >
+            {{ report.status }}
+          </span>
+        </div>
+
+        <h3>{{ report.description || 'Sin descripción' }}</h3>
+
+        <div class="report-details">
+          <p>
+            <ion-icon name="alert-circle-outline"></ion-icon>
+            <strong>Gravedad:</strong>
+            {{ report.severity || 'No especificada' }}
+          </p>
+
+          <p>
+            <ion-icon name="water-outline"></ion-icon>
+            <strong>Incidente:</strong>
+            {{ report.incident_type || 'No especificado' }}
+          </p>
+
+          <p>
+            <ion-icon name="resize-outline"></ion-icon>
+            <strong>Profundidad:</strong>
+            {{ report.water_depth_range || 'No especificada' }}
+          </p>
+
+          <p>
+            <ion-icon name="person-outline"></ion-icon>
+            <strong>ID de usuario:</strong>
+            {{ report.user_id }}
+          </p>
+
+          <p>
+            <ion-icon name="location-outline"></ion-icon>
+            <strong>Coordenadas:</strong>
+            {{ report.latitude }}, {{ report.longitude }}
+          </p>
+        </div>
+
+        <ion-button
+          fill="outline"
+          size="small"
+          (click)="openLocation(report)"
+        >
+          <ion-icon name="map-outline" slot="start"></ion-icon>
+          Ver ubicación
+        </ion-button>
+
+        <div class="report-actions" *ngIf="report.status === 'pendiente'">
+          <ion-button
+            color="success"
+            expand="block"
+            (click)="changeStatus(report, 'aprobado')"
+            [disabled]="updatingIds.has(report.id)"
+          >
+            <ion-icon name="checkmark-circle-outline" slot="start"></ion-icon>
+            Aprobar
+          </ion-button>
+
+          <ion-button
+            color="danger"
+            fill="outline"
+            expand="block"
+            (click)="changeStatus(report, 'rechazado')"
+            [disabled]="updatingIds.has(report.id)"
+          >
+            <ion-icon name="close-circle-outline" slot="start"></ion-icon>
+            Rechazar
+          </ion-button>
+        </div>
+
+        <div class="updating-message" *ngIf="updatingIds.has(report.id)">
+          <ion-spinner name="crescent"></ion-spinner>
+          Actualizando estado...
+        </div>
+      </article>
+    </section>
+  </div>
+</ion-content>

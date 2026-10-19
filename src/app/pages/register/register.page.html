@@ -1,0 +1,79 @@
+
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Crear cuenta</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <div class="register-container">
+    <h1>Unite a Hidromemoria</h1>
+    <p>Creá tu cuenta para contribuir con los reportes de inundaciones.</p>
+
+    <form (ngSubmit)="register()">
+      <ion-item>
+        <ion-input
+          label="Nombre de usuario"
+          labelPlacement="stacked"
+          name="username"
+          [(ngModel)]="username"
+          autocomplete="username"
+          required>
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-input
+          label="Correo electrónico"
+          labelPlacement="stacked"
+          name="email"
+          type="email"
+          [(ngModel)]="email"
+          autocomplete="email"
+          required>
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-input
+          label="Contraseña"
+          labelPlacement="stacked"
+          name="password"
+          type="password"
+          [(ngModel)]="password"
+          autocomplete="new-password"
+          required>
+        </ion-input>
+      </ion-item>
+
+      <ion-item>
+        <ion-input
+          label="Confirmar contraseña"
+          labelPlacement="stacked"
+          name="confirmPassword"
+          type="password"
+          [(ngModel)]="confirmPassword"
+          autocomplete="new-password"
+          required>
+        </ion-input>
+      </ion-item>
+
+      <ion-text color="danger" *ngIf="errorMessage">
+        <p>{{ errorMessage }}</p>
+      </ion-text>
+
+      <ion-button
+        expand="block"
+        type="submit"
+        [disabled]="loading">
+        <ion-spinner *ngIf="loading" name="crescent"></ion-spinner>
+        <span *ngIf="!loading">Crear cuenta</span>
+      </ion-button>
+    </form>
+
+    <p class="login-link">
+      ¿Ya tenés una cuenta?
+      <a routerLink="/login">Iniciá sesión</a>
+    </p>
+  </div>
+</ion-content>

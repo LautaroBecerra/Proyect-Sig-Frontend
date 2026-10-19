@@ -1,0 +1,37 @@
+/*
+ * App Global CSS
+ * ----------------------------------------------------------------------------
+ * Reglas de estilo globales para toda la app.
+ */
+
+/* Core CSS requerido para que los componentes de Ionic funcionen bien */
+@import '@ionic/angular/css/core.css';
+
+/* CSS básico para apps hechas con Ionic */
+@import '@ionic/angular/css/normalize.css';
+@import '@ionic/angular/css/structure.css';
+@import '@ionic/angular/css/typography.css';
+@import '@ionic/angular/css/display.css';
+
+/* Utilidades opcionales de Ionic */
+@import '@ionic/angular/css/padding.css';
+@import '@ionic/angular/css/float-elements.css';
+@import '@ionic/angular/css/text-alignment.css';
+@import '@ionic/angular/css/text-transformation.css';
+@import '@ionic/angular/css/flex-utils.css';
+
+/* CSS de Leaflet, necesario para que el mapa se vea correctamente */
+@import 'leaflet/dist/leaflet.css';
+
+html,
+body {
+  height: 100%;
+}
+
+/* Los controles de zoom (+/-) de Leaflet se generan directo en el DOM por la
+   librería, no por Angular, así que el ajuste va acá (global) y no en el
+   .scss de la página, que no llegaría a alcanzarlos. Los bajamos para que no
+   queden tapados por la barra de búsqueda flotante de la página de mapa. */
+.leaflet-top.leaflet-left {
+  margin-top: calc(env(safe-area-inset-top, 0px) + 64px);
+}

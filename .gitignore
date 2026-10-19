@@ -1,0 +1,32 @@
+# Dependencias
+node_modules/
+
+# Builds
+dist/
+www/
+.angular/
+
+# Capacitor / Android
+android/
+ios/
+
+# Entornos y secretos
+.env
+*.local
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+.idea/
+*.swp
+
+# Logs
+npm-debug.log
+yarn-error.log
+
+# Íconos de Leaflet generados por el postinstall (se regeneran solos)
+src/assets/leaflet/*.png
+
+# Sistema
+.DS_Store
+Thumbs.db

@@ -1,0 +1,56 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/settings"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Mi cuenta</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list-header>
+    <ion-label>Datos personales</ion-label>
+  </ion-list-header>
+
+  <form [formGroup]="accountForm">
+    <ion-item>
+      <ion-label position="stacked">Nombre</ion-label>
+      <ion-input formControlName="name" placeholder="Tu nombre"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Correo</ion-label>
+      <ion-input type="email" formControlName="email" placeholder="tu@correo.com"></ion-input>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-label position="stacked">Teléfono</ion-label>
+      <ion-input type="tel" formControlName="phone" placeholder="+54 9 ..."></ion-input>
+    </ion-item>
+  </form>
+
+  <div class="section-actions">
+    <ion-button expand="block" fill="outline" (click)="saveAccountInfo()">Guardar cambios</ion-button>
+  </div>
+
+  <ion-list-header>
+    <ion-label>Cambiar contraseña</ion-label>
+  </ion-list-header>
+
+  <form [formGroup]="passwordForm">
+    <ion-item>
+      <ion-label position="stacked">Contraseña actual</ion-label>
+      <ion-input type="password" formControlName="currentPassword"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label position="stacked">Nueva contraseña</ion-label>
+      <ion-input type="password" formControlName="newPassword"></ion-input>
+    </ion-item>
+    <ion-item lines="none">
+      <ion-label position="stacked">Confirmar nueva contraseña</ion-label>
+      <ion-input type="password" formControlName="confirmPassword"></ion-input>
+    </ion-item>
+  </form>
+
+  <div class="section-actions">
+    <ion-button expand="block" fill="outline" (click)="changePassword()">Cambiar contraseña</ion-button>
+  </div>
+</ion-content>

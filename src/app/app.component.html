@@ -1,0 +1,30 @@
+<ion-app>
+  <!-- [when]="false" desactiva el comportamiento "permanente" que trae
+       ion-split-pane por defecto en pantallas anchas (>768px). Sin esto, en
+       desktop el menú queda fijo ocupando una columna y le come espacio al
+       mapa; con esto, se comporta siempre como un panel que se abre/cierra
+       con el botón de menú, sin importar el tamaño de pantalla. -->
+  <ion-split-pane contentId="main-content" [when]="false">
+    <ion-menu contentId="main-content">
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>Hidromemoria</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content>
+        <ion-list>
+          @for (page of appPages; track page.url) {
+            <ion-menu-toggle autoHide="false">
+              <ion-item [routerLink]="page.url" routerLinkActive="selected" lines="none" detail="false">
+                <ion-icon slot="start" [name]="page.icon"></ion-icon>
+                <ion-label>{{ page.title }}</ion-label>
+              </ion-item>
+            </ion-menu-toggle>
+          }
+        </ion-list>
+      </ion-content>
+    </ion-menu>
+
+    <ion-router-outlet id="main-content"></ion-router-outlet>
+  </ion-split-pane>
+</ion-app>

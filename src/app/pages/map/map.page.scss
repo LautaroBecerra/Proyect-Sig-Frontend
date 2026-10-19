@@ -1,0 +1,126 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.map-container {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+}
+
+// Píldora blanca flotante con el menú + buscador + refrescar,
+// como la barra de búsqueda de Google Maps.
+.map-topbar {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 10px);
+  left: 12px;
+  right: 12px;
+  z-index: 1000;
+  max-width: 480px;
+  display: flex;
+  align-items: center;
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.3);
+  padding: 2px 6px 2px 2px;
+
+  .topbar-icon {
+    flex-shrink: 0;
+    margin: 0;
+    --color: #5f6368;
+  }
+
+  .topbar-search {
+    flex: 1;
+    padding: 0;
+    --background: transparent;
+    --box-shadow: none;
+    --border-radius: 0;
+    --placeholder-color: #5f6368;
+    --icon-color: #5f6368;
+  }
+}
+
+.search-results {
+  position: absolute;
+  top: calc(env(safe-area-inset-top, 0px) + 62px);
+  left: 12px;
+  right: 12px;
+  max-width: 480px;
+  z-index: 999;
+  border-radius: 12px;
+  overflow-y: auto;
+  max-height: 260px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.loading-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.45);
+  z-index: 1000;
+}
+
+// Contenedor de cada botón circular de abajo. Es él (no el ion-button) el
+// que se posiciona en pantalla, para que el tooltip (span.fab-tooltip) se
+// pueda centrar respecto al botón sin importar dónde esté.
+.fab-wrapper {
+  position: absolute;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 16px);
+  z-index: 500;
+
+  &--end {
+    right: 16px;
+  }
+
+  &--start {
+    left: 16px;
+  }
+}
+
+// Botón circular "mini logo": solo ícono, sin texto permanente.
+.icon-fab {
+  width: 56px;
+  height: 56px;
+  margin: 0;
+  --border-radius: 50%;
+  --box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+
+  ion-icon {
+    font-size: 24px;
+  }
+}
+
+// Etiqueta que aparece arriba del botón mientras se lo mantiene presionado.
+.fab-tooltip {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(32, 33, 36, 0.92);
+  color: #fff;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 6px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: fab-tooltip-in 0.12s ease-out;
+}
+
+@keyframes fab-tooltip-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 4px);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+}

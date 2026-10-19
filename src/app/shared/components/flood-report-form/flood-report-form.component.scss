@@ -1,0 +1,207 @@
+.form-section {
+  margin-bottom: 24px;
+
+  h2 {
+    font-size: 16px;
+    font-weight: 600;
+    margin: 0 0 4px;
+  }
+}
+
+.section-hint {
+  font-size: 14px;
+  color: var(--ion-color-medium-shade, #6b6d70);
+  margin: 0 0 10px;
+}
+
+// ---- Chips (tipo de incidente / rango de tirante) ----
+.chip-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--ion-color-light-shade, #d7d8da);
+  background: #fff;
+  font-size: 14px;
+  color: var(--ion-color-dark, #222);
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+
+  &.selected {
+    background: var(--ion-color-primary, #3880ff);
+    border-color: var(--ion-color-primary, #3880ff);
+    color: #fff;
+    font-weight: 600;
+  }
+}
+
+.chip-emoji {
+  font-size: 16px;
+}
+
+// ---- Botones de elección (Sí/No, opciones exclusivas) ----
+.choice-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  &.choice-group--vertical {
+    flex-direction: column;
+  }
+}
+
+.choice-btn {
+  flex: 1;
+  min-width: 100px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1.5px solid var(--ion-color-light-shade, #d7d8da);
+  background: #fff;
+  font-size: 14px;
+  text-align: center;
+  color: var(--ion-color-dark, #222);
+  cursor: pointer;
+  transition: background-color 0.15s, border-color 0.15s, color 0.15s;
+
+  &.selected {
+    background: var(--ion-color-primary-tint, #4c8dff);
+    border-color: var(--ion-color-primary, #3880ff);
+    color: #fff;
+    font-weight: 600;
+  }
+}
+
+.choice-group--vertical .choice-btn {
+  text-align: left;
+  min-width: unset;
+}
+
+.follow-up {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px dashed var(--ion-color-light-shade, #d7d8da);
+}
+
+.form-textarea {
+  --background: #f4f5f8;
+  --padding-start: 12px;
+  --padding-end: 12px;
+  --padding-top: 10px;
+  --padding-bottom: 10px;
+  border-radius: 12px;
+}
+
+// ---- Sección privada, visualmente diferenciada ----
+.private-section {
+  background: #fff7e6;
+  border: 1px solid #ffe4a3;
+  border-radius: 16px;
+  padding: 16px;
+  margin-bottom: 24px;
+}
+
+.private-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+
+  ion-icon {
+    font-size: 20px;
+    color: #b98900;
+  }
+
+  h2 {
+    font-size: 15px;
+    font-weight: 700;
+    margin: 0;
+    color: #7a5c00;
+  }
+}
+
+.private-hint {
+  font-size: 13px;
+  color: #8a6d1f;
+  margin: 0 0 16px;
+  line-height: 1.4;
+}
+
+.private-block {
+  margin-bottom: 18px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+.private-question {
+  font-size: 14px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: var(--ion-color-dark, #222);
+}
+
+.private-toggle-item {
+  --background: transparent;
+  --padding-start: 0;
+}
+
+// ---- Fotografía ----
+.photo-input-hidden {
+  display: none;
+}
+
+.photo-picker {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 28px;
+  border: 2px dashed var(--ion-color-light-shade, #d7d8da);
+  border-radius: 12px;
+  color: var(--ion-color-medium-shade, #6b6d70);
+  cursor: pointer;
+  font-size: 14px;
+
+  ion-icon {
+    font-size: 28px;
+  }
+}
+
+.photo-preview {
+  text-align: center;
+
+  img {
+    max-width: 100%;
+    max-height: 220px;
+    border-radius: 12px;
+    object-fit: cover;
+  }
+}
+
+// ---- Notas finales ----
+.contact-note {
+  font-size: 12px;
+  color: var(--ion-color-medium-shade, #6b6d70);
+  margin: 8px 0 12px;
+
+  a {
+    color: var(--ion-color-primary, #3880ff);
+  }
+}
+
+.confirmation-note {
+  font-size: 12px;
+  font-style: italic;
+  color: var(--ion-color-medium-shade, #6b6d70);
+  margin: 0 0 20px;
+  line-height: 1.4;
+}

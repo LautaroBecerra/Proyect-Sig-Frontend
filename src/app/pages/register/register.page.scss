@@ -1,0 +1,40 @@
+
+.register-container {
+  max-width: 440px;
+  margin: 32px auto;
+}
+
+h1 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.register-container > p {
+  color: var(--ion-color-medium);
+  margin-bottom: 28px;
+  line-height: 1.5;
+}
+
+ion-item {
+  --border-radius: 10px;
+  --padding-start: 12px;
+  margin-bottom: 14px;
+}
+
+ion-button {
+  margin-top: 24px;
+  --border-radius: 10px;
+  min-height: 48px;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 0.95rem;
+}
+
+.login-link a {
+  font-weight: 600;
+  text-decoration: none;
+}

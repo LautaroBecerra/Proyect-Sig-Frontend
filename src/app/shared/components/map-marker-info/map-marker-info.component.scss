@@ -1,0 +1,82 @@
+.sheet {
+  padding: 8px 20px 24px;
+}
+
+.sheet-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--ion-color-medium-tint, #ccc);
+  margin: 0 auto 16px;
+}
+
+.sheet-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.severity-badge {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+
+  // Fondo suave + ícono con el color "fuerte" del mismo severity.
+  &[data-color='success'] {
+    background: var(--ion-color-success-tint, #d5f5e3);
+    color: var(--ion-color-success, #2dd36f);
+  }
+  &[data-color='warning'] {
+    background: #fff3cd;
+    color: var(--ion-color-warning-shade, #e0ac08);
+  }
+  &[data-color='danger'] {
+    background: #fbdcdc;
+    color: var(--ion-color-danger, #eb445a);
+  }
+  &[data-color='medium'] {
+    background: #eceef0;
+    color: var(--ion-color-medium, #92949c);
+  }
+}
+
+.sheet-title {
+  flex: 1;
+
+  h2 {
+    margin: 0 0 4px;
+    font-size: 18px;
+    font-weight: 600;
+  }
+}
+
+.close-btn {
+  margin: -8px -8px 0 0;
+  --color: #5f6368;
+}
+
+.description {
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--ion-color-dark, #222);
+  margin: 0 0 16px;
+}
+
+.meta-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--ion-color-medium-shade, #6b6d70);
+  margin-bottom: 6px;
+
+  ion-icon {
+    font-size: 16px;
+  }
+}

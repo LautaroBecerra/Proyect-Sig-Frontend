@@ -1,0 +1,26 @@
+.settings-list {
+  padding: 8px 4px;
+
+  ion-item {
+    --min-height: 44px;
+    --padding-start: 12px;
+    --padding-end: 8px;
+    --background-hover: #f1f3f4;
+    --background-activated: #f1f3f4;
+    border-radius: 10px;
+    margin-bottom: 2px;
+    font-size: 14px;
+  }
+}
+
+.logout-list {
+  margin-top: 20px;
+}
+
+// Íconos de línea simples, sin fondo de color — mismo gris parejo para
+// todos (el de "Cerrar sesión" queda afuera, mantiene su color="danger").
+.settings-icon {
+  font-size: 19px;
+  color: #5f6368;
+  margin-inline-end: 14px;
+}

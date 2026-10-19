@@ -1,0 +1,58 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/map" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Configuración</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>  
+  <ion-list lines="none" class="settings-list" *ngIf="isAdmin">
+    <ion-item button routerLink="/admin" detail="true">
+      <ion-icon
+        slot="start"
+        name="shield-checkmark-outline"
+        class="settings-icon">
+      </ion-icon>
+      <ion-label>
+        <h2>Administración</h2>
+        <p>Gestionar reportes de Hidromemoria</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ion-list lines="none" class="settings-list">
+    <ion-item button routerLink="/settings/account" detail="false">
+      <ion-icon slot="start" name="person-outline" class="settings-icon"></ion-icon>
+      <ion-label>Mi cuenta</ion-label>
+    </ion-item>
+
+    <ion-item button routerLink="/settings/notifications" detail="false">
+      <ion-icon slot="start" name="notifications-outline" class="settings-icon"></ion-icon>
+      <ion-label>Notificaciones</ion-label>
+    </ion-item>
+
+    <ion-item button routerLink="/settings/map" detail="false">
+      <ion-icon slot="start" name="map-outline" class="settings-icon"></ion-icon>
+      <ion-label>Mapa</ion-label>
+    </ion-item>
+
+    <ion-item button routerLink="/settings/privacy" detail="false">
+      <ion-icon slot="start" name="lock-closed-outline" class="settings-icon"></ion-icon>
+      <ion-label>Privacidad</ion-label>
+    </ion-item>
+
+    <ion-item button routerLink="/settings/about" detail="false">
+      <ion-icon slot="start" name="information-circle-outline" class="settings-icon"></ion-icon>
+      <ion-label>Acerca de</ion-label>
+    </ion-item>
+  </ion-list>
+
+  <ion-list lines="none" class="settings-list logout-list">
+    <ion-item button detail="false" (click)="confirmLogout()">
+      <ion-icon slot="start" name="log-out-outline" color="danger"></ion-icon>
+      <ion-label color="danger">Cerrar sesión</ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>
