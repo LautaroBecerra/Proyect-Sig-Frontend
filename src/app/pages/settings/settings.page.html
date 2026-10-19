@@ -6,22 +6,7 @@
     <ion-title>Configuración</ion-title>
   </ion-toolbar>
 </ion-header>
-
 <ion-content>  
-  <ion-list lines="none" class="settings-list" *ngIf="isAdmin">
-    <ion-item button routerLink="/admin" detail="true">
-      <ion-icon
-        slot="start"
-        name="shield-checkmark-outline"
-        class="settings-icon">
-      </ion-icon>
-      <ion-label>
-        <h2>Administración</h2>
-        <p>Gestionar reportes de Hidromemoria</p>
-      </ion-label>
-    </ion-item>
-  </ion-list>
-
   <ion-list lines="none" class="settings-list">
     <ion-item button routerLink="/settings/account" detail="false">
       <ion-icon slot="start" name="person-outline" class="settings-icon"></ion-icon>

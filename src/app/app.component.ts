@@ -36,18 +36,32 @@ export class AppComponent implements OnInit {
   // acá con el mismo patrón (title + url + icon) y aparecen solas en el
   // menú, sin tocar el HTML. "Mapa" no está listado a propósito: es la
   // página raíz de la app, siempre estás ahí, no hace falta un link a sí misma.
-  readonly appPages: AppPage[] = [
-  {
-    title: 'Mis reportes',
-    url: '/my-reports',
-    icon: 'document-text-outline'
-  },
-  {
-    title: 'Configuración',
-    url: '/settings',
-    icon: 'settings-outline'
+
+get appPages(): AppPage[] {
+  const pages: AppPage[] = [];
+
+  // Solo los administradores ven este botón.
+  if (this.authService.currentUser?.role === 'admin') {
+    pages.push({
+      title: 'Administración',
+      url: '/admin',
+      icon: 'shield-checkmark-outline'
+    });
   }
-];
+  pages.push(
+    {
+      title: 'Mis reportes',
+      url: '/my-reports',
+      icon: 'document-text-outline'
+    },
+    {
+      title: 'Configuración',
+      url: '/settings',
+      icon: 'settings-outline'
+    }
+  );
+  return pages;
+}
   constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
