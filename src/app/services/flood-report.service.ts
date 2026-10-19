@@ -32,6 +32,12 @@ export class FloodReportService {
       .pipe(map(res => res.data));
   }
 
+  getApprovedReports(): Observable<FloodReport[]> {
+  return this.http
+    .get<ApiResponse<FloodReport[]>>(`${this.baseUrl}/public`)
+    .pipe(map(res => res.data));
+  }
+
   updateReportStatus(id: number, status: 'aprobado' | 'rechazado'): Observable<FloodReport> {
     return this.http
       .patch<ApiResponse<FloodReport>>(

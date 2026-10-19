@@ -1,0 +1,77 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/map" text=""></ion-back-button>
+    </ion-buttons>
+    <ion-title>Mis reportes</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="loadReports($event)">
+    <ion-refresher-content
+      pullingText="Deslizá para actualizar"
+      refreshingText="Actualizando reportes...">
+    </ion-refresher-content>
+  </ion-refresher>
+
+  <div class="ion-padding" *ngIf="loading && reports.length === 0">
+    <ion-spinner name="crescent"></ion-spinner>
+    <p>Cargando tus reportes...</p>
+  </div>
+
+  <div class="ion-padding" *ngIf="!loading && errorMessage">
+    <ion-text color="danger">
+      <p>{{ errorMessage }}</p>
+    </ion-text>
+
+    <ion-button expand="block" (click)="loadReports()">
+      Reintentar
+    </ion-button>
+  </div>
+
+  <div
+    class="ion-padding empty-state"
+    *ngIf="!loading && !errorMessage && reports.length === 0">
+
+    <ion-icon name="document-text-outline" class="empty-icon"></ion-icon>
+    <h2>Todavía no tenés reportes</h2>
+    <p>Cuando publiques un reporte de inundación, vas a poder consultarlo acá.</p>
+
+    <ion-button routerLink="/map">
+      Volver al mapa
+    </ion-button>
+  </div>
+
+  <ion-list *ngIf="reports.length > 0">
+    <ion-item *ngFor="let report of reports">
+      <ion-label>
+        <h2>{{ report.incident_type || 'Reporte de inundación' }}</h2>
+
+        <p *ngIf="report.description">
+          {{ report.description }}
+        </p>
+
+        <p>
+          Fecha: {{ report.created_at | date:'dd/MM/yyyy HH:mm' }}
+        </p>
+
+        <p *ngIf="report.water_depth_range">
+          Profundidad: {{ report.water_depth_range }}
+        </p>
+
+        <p *ngIf="report.severity">
+          Severidad: {{ report.severity }}
+        </p>
+
+        <ion-badge
+          [color]="
+            report.status === 'aprobado' ? 'success' :
+            report.status === 'rechazado' ? 'danger' : 'warning'
+          ">
+          {{ report.status }}
+        </ion-badge>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

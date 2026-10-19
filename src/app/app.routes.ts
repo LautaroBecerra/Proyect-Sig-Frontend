@@ -26,6 +26,12 @@ export const routes: Routes = [
   {
     path: 'map',
     loadComponent: () => import('./pages/map/map.page').then(m => m.MapPage)
+  },  
+  {
+    path: 'my-reports',
+    canActivate: [authGuard],
+    loadComponent: () =>
+      import('./pages/my-reports/my-reports.page').then(m => m.MyReportsPage)
   },
   {
     path: 'settings',

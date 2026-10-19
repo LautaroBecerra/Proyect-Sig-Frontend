@@ -184,7 +184,8 @@ export class MapPage implements AfterViewInit, OnDestroy {
 
   private loadReports(): void {
     this.loading = true;
-    this.floodReportService.getReports().subscribe({
+
+    this.floodReportService.getApprovedReports().subscribe({
       next: (reports) => {
         this.renderReports(reports);
         this.loading = false;
@@ -261,31 +262,69 @@ private async openCreateReportForm(latlng: L.LatLng): Promise<void> {
   });
 
   modal.onDidDismiss().then(({ data, role }) => {
-    this.handleReportFormResult(data, role);
-  });
+  this.handleReportFormResult(data, role, latlng.lat, latlng.lng);
+});
 
   await modal.present();
 }
 
-
-  private handleReportFormResult(data: FloodReportFormValue | null, role?: string): void {
+  private handleReportFormResult(
+    data: FloodReportFormValue | null,
+    role?: string,
+    latitude?: number,
+    longitude?: number
+  ): void {
     if (role !== 'submitted' || !data) {
-      return; // el usuario canceló (X o swipe), no hay nada que hacer.
+      return;
     }
 
-    // TODO: acá todavía NO se llama a FloodReportService.createReport().
-    // El backend real solo acepta { user_id, latitude, longitude,
-    // description, severity } — no tiene campos para tipoIncidente,
-    // rangoTirante, la sección privada, ni fotografía. Cuando el backend
-    // soporte este formulario completo (y exista el estado de aprobación
-    // mencionado en el pedido), acá se arma el payload real a partir de
-    // "data" y se hace this.loadReports() después de crearlo para que
-    // aparezca el marcador nuevo.
-    console.log('[MapPage] Reporte recibido del formulario (mock):', data);
-    this.presentToast(
-      'Reporte registrado localmente (simulado) — todavía no se conecta al backend.',
-      'success'
-    );
+    const user = this.authService.currentUser;
+    const userId = Number(user?.id);
+
+    if (!Number.isInteger(userId) || userId <= 0) {
+      this.presentToast(
+        'No se pudo identificar tu usuario. Iniciá sesión nuevamente.',
+        'danger'
+      );
+      return;
+    }
+
+    if (
+      latitude === undefined ||
+      longitude === undefined ||
+      !Number.isFinite(latitude) ||
+      !Number.isFinite(longitude)
+    ) {
+      this.presentToast(
+        'No se pudieron obtener las coordenadas del reporte.',
+        'danger'
+      );
+      return;
+    }
+
+    const payload = {
+      user_id: userId,
+      latitude,
+      longitude,
+      description: data.descripcion
+    };
+
+    this.loading = true;
+
+    this.floodReportService.createReport(payload).subscribe({
+      next: () => {
+        this.loading = false;
+
+      this.presentToast(
+        'Reporte guardado. Está pendiente de aprobación.',
+        'success'
+      );
+    },
+    error: (error) => {
+        this.loading = false;
+        this.handleHttpError(error);
+      }
+    });
   }
 
   private handleHttpError(error: any): void {

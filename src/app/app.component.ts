@@ -1,20 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import {
-  IonApp,
-  IonContent,
-  IonHeader,
-  IonIcon,
-  IonItem,
-  IonLabel,
-  IonList,
-  IonMenu,
-  IonMenuToggle,
-  IonRouterOutlet,
-  IonSplitPane,
-  IonTitle,
-  IonToolbar
-} from '@ionic/angular/standalone';
+import {IonApp, IonContent, IonHeader, IonIcon, IonItem, IonLabel, IonList, IonMenu, IonMenuToggle, IonRouterOutlet, IonSplitPane, IonTitle, IonToolbar} from '@ionic/angular/standalone';
 import { AuthService } from './services/auth.service';
 
 interface AppPage {
@@ -50,8 +36,18 @@ export class AppComponent implements OnInit {
   // acá con el mismo patrón (title + url + icon) y aparecen solas en el
   // menú, sin tocar el HTML. "Mapa" no está listado a propósito: es la
   // página raíz de la app, siempre estás ahí, no hace falta un link a sí misma.
-  readonly appPages: AppPage[] = [{ title: 'Configuración', url: '/settings', icon: 'settings-outline' }];
-
+  readonly appPages: AppPage[] = [
+  {
+    title: 'Mis reportes',
+    url: '/my-reports',
+    icon: 'document-text-outline'
+  },
+  {
+    title: 'Configuración',
+    url: '/settings',
+    icon: 'settings-outline'
+  }
+];
   constructor(private authService: AuthService) {}
 
   ngOnInit(): void {
