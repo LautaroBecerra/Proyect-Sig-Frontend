@@ -8,7 +8,9 @@
 
     <div class="sheet-title">
       <h2>Reporte de inundación</h2>
-      <ion-badge [color]="severityMeta.color">{{ severityMeta.label }}</ion-badge>
+      <ion-badge [color]="severityMeta.color">
+        {{ severityMeta.label }}
+      </ion-badge>
     </div>
 
     <ion-button fill="clear" class="close-btn" (click)="dismiss()">
@@ -16,17 +18,57 @@
     </ion-button>
   </div>
 
-  <p class="description">
-    {{ report.description?.trim() || 'Este reporte no tiene descripción.' }}
-  </p>
+  <div class="report-meta">
+    <div class="meta-row">
+      <ion-icon name="time-outline"></ion-icon>
+      <span>{{ formattedDate }}</span>
+    </div>
 
-  <div class="meta-row">
-    <ion-icon name="time-outline"></ion-icon>
-    <span>{{ formattedDate }}</span>
+    <div class="meta-row">
+      <ion-icon name="person-outline"></ion-icon>
+      <span>
+        Reportado por: {{ report.username || ('Usuario #' + report.user_id) }}
+      </span>
+    </div>
   </div>
 
-  <div class="meta-row">
-    <ion-icon name="person-outline"></ion-icon>
-    <span>Reportado por el usuario #{{ report.user_id }}</span>
+  <div class="description-card">
+    <span class="section-label">DESCRIPCIÓN</span>
+    <p class="description">
+      {{ report.description?.trim() || 'Este reporte no tiene descripción.' }}
+    </p>
+  </div>
+
+  <div class="report-details">
+    <h3>Detalles del incidente</h3>
+
+    <div class="details-grid">
+      <div class="detail-item" *ngIf="report.incident_type">
+        <ion-icon name="warning-outline" class="detail-icon incident-icon"></ion-icon>
+        <span class="detail-label">Tipo de incidente</span>
+        <strong>{{ report.incident_type }}</strong>
+      </div>
+
+      <div class="detail-item" *ngIf="report.water_depth_range">
+        <ion-icon name="water-outline" class="detail-icon water-icon"></ion-icon>
+        <span class="detail-label">Profundidad del agua</span>
+        <strong>{{ report.water_depth_range }}</strong>
+      </div>
+
+      <div class="detail-item detail-full"
+        *ngIf="report.problem_persists !== null && report.problem_persists !== undefined">
+        <ion-icon
+          [name]="report.problem_persists ? 'alert-circle-outline' : 'checkmark-circle-outline'"
+          class="detail-icon"
+          [class.problem-yes]="report.problem_persists"
+          [class.problem-no]="!report.problem_persists">
+        </ion-icon>
+
+        <div class="problem-content">
+          <span class="detail-label">¿El problema continúa?</span>
+          <strong>{{ report.problem_persists ? 'Sí, continúa' : 'No, ya no continúa' }}</strong>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

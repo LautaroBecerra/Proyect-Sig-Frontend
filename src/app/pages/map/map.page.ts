@@ -43,6 +43,7 @@ export class MapPage implements AfterViewInit, OnDestroy {
   private userMarker?: L.Marker;
   private searchMarker?: L.Marker;
   private reportMarkers: L.Marker[] = [];
+  private reportsRefreshInterval?: ReturnType<typeof setInterval>;
   private resizeObserver?: ResizeObserver;
   private searchSubscription?: Subscription;
 
@@ -75,10 +76,16 @@ export class MapPage implements AfterViewInit, OnDestroy {
     this.initMap();
     await this.centerOnUser();
     this.loadReports();
+    this.reportsRefreshInterval = setInterval(() => {
+    this.loadReports();
+      }, 20000);
     this.initSearch();
   }
 
   ngOnDestroy(): void {
+    if (this.reportsRefreshInterval) {
+      clearInterval(this.reportsRefreshInterval);
+     }
     this.resizeObserver?.disconnect();
     this.searchSubscription?.unsubscribe();
     this.map?.remove();
@@ -277,7 +284,6 @@ private async openCreateReportForm(latlng: L.LatLng): Promise<void> {
     if (role !== 'submitted' || !data) {
       return;
     }
-
     const user = this.authService.currentUser;
     const userId = Number(user?.id);
 
@@ -288,7 +294,6 @@ private async openCreateReportForm(latlng: L.LatLng): Promise<void> {
       );
       return;
     }
-
     if (
       latitude === undefined ||
       longitude === undefined ||
@@ -302,15 +307,54 @@ private async openCreateReportForm(latlng: L.LatLng): Promise<void> {
       return;
     }
 
+    const incidentLabels: Record<string, string> = {
+      calle_con_agua: 'Calle con agua',
+      calle_cortada: 'Calle cortada',
+      calle_erosionada: 'Calle erosionada o socavada',
+      agua_en_viviendas: 'Agua dentro de viviendas',
+      boca_tormenta_obstruida: 'Boca de tormenta obstruida',
+      canal_desbordado: 'Canal o zanja desbordada'
+  };
+
+    const waterDepthLabels: Record<string, string> = {
+      '0_5': '0 a 5 cm',
+      '5_20': '5 a 20 cm',
+      '20_50': '20 a 50 cm',
+      '50_100': '50 cm a 1 m',
+      mas_100: 'Más de 1 m'
+  };
+
+    const selectedIncidents = data.tipoIncidente
+      .map((key) => incidentLabels[key])
+      .filter((label): label is string => Boolean(label));
+
+    if (selectedIncidents.length === 0) {
+     this.presentToast(
+        'Seleccioná al menos un tipo de incidente válido.',
+        'warning'
+      );
+     return;
+  }
+
+  // El backend admite un solo incident_type.
+  // Por ahora enviamos el primero seleccionado.
     const payload = {
       user_id: userId,
       latitude,
       longitude,
-      description: data.descripcion
-    };
-
+      description: data.descripcion.trim(),
+      incident_type: selectedIncidents[0],
+      water_depth_range: data.rangoTirante
+      ? waterDepthLabels[data.rangoTirante]
+      : undefined,
+      problem_persists:
+      data.problemaPresente === 'si'
+        ? true
+        : data.problemaPresente === 'no'
+          ? false
+          : undefined
+  };
     this.loading = true;
-
     this.floodReportService.createReport(payload).subscribe({
       next: () => {
         this.loading = false;

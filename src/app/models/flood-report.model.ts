@@ -5,6 +5,7 @@
 export interface FloodReport {
   id: number;
   user_id: number;
+  username?: string | null;
   latitude: number;
   longitude: number;
 
@@ -23,17 +24,15 @@ export interface FloodReport {
   status: 'pendiente' | 'aprobado' | 'rechazado';
   created_at: string;
 }
-
-// ✅ Confirmado contra flood.reports.interface.ts / flood.reports.services.ts:
-// user_id, latitude y longitude son obligatorios (el service valida rangos
-// -90..90 / -180..180 del lado del backend). severity es texto libre, no un
-// enum cerrado. user_id sigue siendo temporal hasta que exista login.
 export interface CreateFloodReportDto {
   user_id: number;
   latitude: number;
   longitude: number;
   description?: string;
   severity?: string;
+  incident_type?: string;
+  water_depth_range?: string;
+  problem_persists?: boolean;
 }
 
 // Coincide exactamente con UpdateFloodReport del backend: no permite tocar user_id.
