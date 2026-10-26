@@ -1,13 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  AbstractControl,
-  FormBuilder,
-  FormGroup,
-  ReactiveFormsModule,
-  ValidationErrors,
-  Validators
-} from '@angular/forms';
+import {AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators} from '@angular/forms';
 import { IonicModule, ToastController } from '@ionic/angular';
 import { SettingsStateService } from '../../../services/settings-state.service';
 import { AuthService } from '../../../services/auth.service';
@@ -34,6 +27,7 @@ function passwordsMatchValidator(group: AbstractControl): ValidationErrors | nul
 export class AccountSettingsPage implements OnInit {
   accountForm: FormGroup;
   passwordForm: FormGroup;
+  showPasswordForm = false;
 
   constructor(
     private fb: FormBuilder,
@@ -98,5 +92,18 @@ export class AccountSettingsPage implements OnInit {
   private async presentToast(message: string, color: string): Promise<void> {
     const toast = await this.toastCtrl.create({ message, duration: 2500, color, position: 'bottom' });
     await toast.present();
+  }
+
+  togglePasswordForm(): void {
+  this.showPasswordForm = !this.showPasswordForm;
+
+  if (!this.showPasswordForm) {
+    this.passwordForm.reset();
+    }
+  }
+
+  cancelPasswordChange(): void {
+    this.passwordForm.reset();
+    this.showPasswordForm = false;
   }
 }

@@ -1,56 +1,199 @@
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/settings"></ion-back-button>
+      <ion-back-button defaultHref="/settings" text=""></ion-back-button>
     </ion-buttons>
     <ion-title>Mi cuenta</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-list-header>
-    <ion-label>Datos personales</ion-label>
-  </ion-list-header>
+<ion-content class="account-content">
+  <div class="account-container">
 
-  <form [formGroup]="accountForm">
-    <ion-item>
-      <ion-label position="stacked">Nombre</ion-label>
-      <ion-input formControlName="name" placeholder="Tu nombre"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label position="stacked">Correo</ion-label>
-      <ion-input type="email" formControlName="email" placeholder="tu@correo.com"></ion-input>
-    </ion-item>
-    <ion-item lines="none">
-      <ion-label position="stacked">Teléfono</ion-label>
-      <ion-input type="tel" formControlName="phone" placeholder="+54 9 ..."></ion-input>
-    </ion-item>
-  </form>
+    <!-- Encabezado del perfil -->
+    <section class="profile-header">
+      <div class="profile-avatar">
+        <ion-icon name="person-outline"></ion-icon>
+      </div>
 
-  <div class="section-actions">
-    <ion-button expand="block" fill="outline" (click)="saveAccountInfo()">Guardar cambios</ion-button>
+      <div class="profile-info">
+        <h2>{{ accountForm.get('name')?.value || 'Mi perfil' }}</h2>
+        <p>{{ accountForm.get('email')?.value || 'Sin correo registrado' }}</p>
+        <span class="profile-caption">
+          <ion-icon name="shield-checkmark-outline"></ion-icon>
+          Tu cuenta de Hidromemoria
+        </span>
+      </div>
+    </section>
+
+    <!-- Datos personales -->
+    <section class="account-section">
+      <div class="section-heading">
+        <div class="section-heading-icon">
+          <ion-icon name="person-outline"></ion-icon>
+        </div>
+        <div>
+          <h3>Datos personales</h3>
+          <p>Información de tu perfil</p>
+        </div>
+      </div>
+
+      <form [formGroup]="accountForm" class="account-form">
+        <ion-item class="form-item" lines="none">
+          <ion-icon
+            name="person-outline"
+            slot="start"
+            class="field-icon">
+          </ion-icon>
+          <ion-label position="stacked">Nombre de usuario</ion-label>
+          <ion-input
+            formControlName="name"
+            placeholder="Tu nombre"
+            autocomplete="nickname">
+          </ion-input>
+        </ion-item>
+
+        <ion-item class="form-item" lines="none">
+          <ion-icon
+            name="mail-outline"
+            slot="start"
+            class="field-icon">
+          </ion-icon>
+          <ion-label position="stacked">Correo electrónico</ion-label>
+          <ion-input
+            type="email"
+            formControlName="email"
+            placeholder="tu@correo.com"
+            autocomplete="email">
+          </ion-input>
+        </ion-item>
+
+        <ion-item class="form-item" lines="none">
+          <ion-icon
+            name="call-outline"
+            slot="start"
+            class="field-icon">
+          </ion-icon>
+          <ion-label position="stacked">Teléfono</ion-label>
+          <ion-input
+            type="tel"
+            formControlName="phone"
+            placeholder="+54 9 ..."
+            autocomplete="tel">
+          </ion-input>
+        </ion-item>
+      </form>
+
+      <div class="section-actions">
+        <ion-button
+          expand="block"
+          class="primary-action"
+          (click)="saveAccountInfo()">
+          <ion-icon name="save-outline" slot="start"></ion-icon>
+          Guardar cambios
+        </ion-button>
+      </div>
+    </section>
+
+    <!-- Seguridad -->
+    
+<!-- Seguridad -->
+  <section class="account-section">
+    <div class="section-heading">
+      <div class="section-heading-icon">
+        <ion-icon name="lock-closed-outline"></ion-icon>
+      </div>
+    <div>
+      <h3>Seguridad</h3>
+      <p>Mantené segura tu cuenta</p>
+    </div>
   </div>
 
-  <ion-list-header>
-    <ion-label>Cambiar contraseña</ion-label>
-  </ion-list-header>
+  <!-- Acceso compacto al cambio de contraseña -->
+  <button
+    type="button"
+    class="security-option"
+    (click)="togglePasswordForm()"
+    [attr.aria-expanded]="showPasswordForm"
+>
+    <ion-icon name="key-outline" class="security-option-icon"></ion-icon>
+      <span class="security-option-label">  Cambiar contraseña  </span>
+    <ion-icon
+      [name]="showPasswordForm ? 'chevron-up-outline' : 'chevron-forward-outline'"
+      class="security-option-arrow"
+    ></ion-icon>
+  </button>
 
-  <form [formGroup]="passwordForm">
-    <ion-item>
-      <ion-label position="stacked">Contraseña actual</ion-label>
-      <ion-input type="password" formControlName="currentPassword"></ion-input>
-    </ion-item>
-    <ion-item>
-      <ion-label position="stacked">Nueva contraseña</ion-label>
-      <ion-input type="password" formControlName="newPassword"></ion-input>
-    </ion-item>
-    <ion-item lines="none">
-      <ion-label position="stacked">Confirmar nueva contraseña</ion-label>
-      <ion-input type="password" formControlName="confirmPassword"></ion-input>
-    </ion-item>
-  </form>
+  <!-- El formulario aparece únicamente cuando se solicita -->
+  <div class="password-panel" *ngIf="showPasswordForm">
+    <form [formGroup]="passwordForm" class="account-form">
 
-  <div class="section-actions">
-    <ion-button expand="block" fill="outline" (click)="changePassword()">Cambiar contraseña</ion-button>
+      <ion-item class="form-item" lines="none">
+        <ion-label position="stacked">Contraseña actual</ion-label>
+        <ion-input
+          type="password"
+          formControlName="currentPassword"
+          autocomplete="current-password">
+          <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+        </ion-input>
+      </ion-item>
+
+      <ion-item class="form-item" lines="none">
+        <ion-label position="stacked">Nueva contraseña</ion-label>
+        <ion-input
+          type="password"
+          formControlName="newPassword"
+          autocomplete="new-password">
+          <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+        </ion-input>
+      </ion-item>
+
+      <ion-item class="form-item" lines="none">
+        <ion-label position="stacked">Confirmar nueva contraseña</ion-label>
+        <ion-input
+          type="password"
+          formControlName="confirmPassword"
+          autocomplete="new-password">
+          <ion-input-password-toggle slot="end"></ion-input-password-toggle>
+        </ion-input>
+      </ion-item>
+
+      <p
+        class="validation-message"
+        *ngIf="passwordForm.hasError('passwordMismatch')
+          && passwordForm.get('confirmPassword')?.touched">
+        Las contraseñas nuevas no coinciden.
+      </p>
+
+      <div class="password-actions">
+        <ion-button
+          expand="block"
+          fill="outline"
+          class="secondary-action"
+          (click)="cancelPasswordChange()">
+          Cancelar
+        </ion-button>
+
+        <ion-button
+          expand="block"
+          class="primary-action"
+          (click)="changePassword()">
+          Actualizar contraseña
+        </ion-button>
+      </div>
+    </form>
+
+      <p class="security-note">
+        <ion-icon name="information-circle-outline"></ion-icon>
+        Usá una contraseña segura que no compartas con otras personas.
+      </p>
+    </div>
+  </section>
+
+
+    <p class="footer-note">
+      Hidromemoria · Configuración de tu cuenta
+    </p>
+
   </div>
 </ion-content>
