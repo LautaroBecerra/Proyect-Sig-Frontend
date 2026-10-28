@@ -40,9 +40,11 @@
   background: var(--ion-color-primary, #3880ff);
   box-shadow: 0 6px 16px rgba(56, 128, 255, 0.35);
 
-  ion-icon {
-    font-size: 32px;
-    color: #fff;
+  img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 50%;
   }
 }
 

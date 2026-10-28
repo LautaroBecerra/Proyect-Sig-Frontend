@@ -1,8 +1,6 @@
-
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule, AlertController, ToastController } from '@ionic/angular';
-
 import { FloodReportService } from '../../services/flood-report.service';
 import { FloodReport } from '../../models/flood-report.model';
 
@@ -127,6 +125,56 @@ export class AdminPage implements OnInit {
       },
     });
   }
+
+  
+  async deleteReport(report: FloodReport): Promise<void> {
+    const alert = await this.alertController.create({
+      header: 'Eliminar reporte',
+      message: `¿Estás seguro de que querés eliminar el reporte #${report.id}? Esta acción no se puede deshacer.`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+        },
+        {
+          text: 'Eliminar',
+          role: 'confirm',
+        },
+      ],
+    });
+
+    await alert.present();
+    const result = await alert.onDidDismiss();
+
+    if (result.role !== 'confirm') {
+      return;
+    }
+
+    this.updatingIds.add(report.id);
+
+    this.floodReportService.deleteReport(report.id).subscribe({
+      next: () => {
+        this.reports = this.reports.filter(
+          item => item.id !== report.id
+        );
+
+        this.updatingIds.delete(report.id);
+        this.showToast(`Reporte #${report.id} eliminado.`);
+      },
+      error: error => {
+        console.error('Error al eliminar el reporte:', error);
+
+        this.updatingIds.delete(report.id);
+
+        this.showToast(
+          error.status === 401 || error.status === 403
+            ? 'No tenés permisos para eliminar reportes.'
+            : 'No se pudo eliminar el reporte.'
+        );
+      },
+    });
+  }
+
 
   async showToast(message: string): Promise<void> {
     const toast = await this.toastController.create({

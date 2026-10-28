@@ -2,22 +2,9 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { IonicModule, ModalController, ToastController } from '@ionic/angular';
-import {
-  AsistenciaNecesaria,
-  EvacuacionEstado,
-  FloodReportFormValue,
-  INCIDENT_TYPES,
-  IncidentTypeKey,
-  ServicioAfectado,
-  SiNo,
-  TIRANTE_RANGES,
-  TirranteRangeKey,
-  TrabajoDetalle
-} from '../../../models/flood-report-form.model';
+import {AsistenciaNecesaria, EvacuacionEstado, FloodReportFormValue, INCIDENT_TYPES, IncidentTypeKey, ServicioAfectado, SiNo, TIRANTE_RANGES, TirranteRangeKey, TrabajoDetalle} from '../../../models/flood-report-form.model';
 
-// TODO: reemplazar por el Gmail de contacto real. Lo dejamos como constante
-// acá arriba, fácil de encontrar y cambiar.
-const CONTACT_EMAIL = 'contacto.proyectsig@gmail.com';
+const CONTACT_EMAIL = 'archivohidro@frvt.utn.edu.ar';
 
 // ⚠️ Formulario 100% frontend por ahora. "submit()" NO llama a ningún
 // service HTTP — arma el objeto (FloodReportFormValue) y lo devuelve al

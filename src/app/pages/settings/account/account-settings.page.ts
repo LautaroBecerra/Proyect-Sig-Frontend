@@ -4,6 +4,7 @@ import {AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, Validation
 import { IonicModule, ToastController } from '@ionic/angular';
 import { SettingsStateService } from '../../../services/settings-state.service';
 import { AuthService } from '../../../services/auth.service';
+import { UserService } from '../../../services/user.service';
 
 function passwordsMatchValidator(group: AbstractControl): ValidationErrors | null {
   const newPassword = group.get('newPassword')?.value;
@@ -13,10 +14,6 @@ function passwordsMatchValidator(group: AbstractControl): ValidationErrors | nul
     : null;
 }
 
-// Nombre y email se precargan desde la sesión real (AuthService). "Guardar
-// cambios" y "Cambiar contraseña" siguen siendo locales/mock: el backend
-// todavía no expone un endpoint para actualizar perfil ni contraseña fuera
-// del login. Ver los TODO puntuales más abajo.
 @Component({
   selector: 'app-account-settings',
   standalone: true,
@@ -28,12 +25,14 @@ export class AccountSettingsPage implements OnInit {
   accountForm: FormGroup;
   passwordForm: FormGroup;
   showPasswordForm = false;
+  savingAccount = false;
 
   constructor(
     private fb: FormBuilder,
     private toastCtrl: ToastController,
     private settingsState: SettingsStateService,
-    private authService: AuthService
+    private authService: AuthService,
+    private userService: UserService
   ) {
     this.accountForm = this.fb.group({
       name: ['', [Validators.required]],
@@ -52,9 +51,6 @@ export class AccountSettingsPage implements OnInit {
   }
 
   ngOnInit(): void {
-    // Nombre/email vienen de la sesión real (AuthService); el teléfono no
-    // existe todavía en el backend, así que sigue siendo solo local
-    // (SettingsStateService), igual que antes.
     const user = this.authService.currentUser;
     this.accountForm.patchValue({
       name: user?.username ?? this.settingsState.account.name,
@@ -63,34 +59,147 @@ export class AccountSettingsPage implements OnInit {
     });
   }
 
-  saveAccountInfo(): void {
+  
+ saveAccountInfo(): void {
     if (this.accountForm.invalid) {
       this.accountForm.markAllAsTouched();
       this.presentToast('Revisá los datos del formulario.', 'warning');
       return;
     }
-    // TODO: reemplazar por UserService.updateProfile(this.accountForm.value)
-    // cuando exista el endpoint correspondiente en el backend.
-    this.settingsState.account = { ...this.accountForm.value };
-    this.presentToast('Datos guardados localmente (todavía no se conecta al backend).', 'success');
+
+    const user = this.authService.currentUser;
+
+    if (!user) {
+      this.presentToast(
+        'No se encontró una sesión activa. Volvé a iniciar sesión.',
+        'warning'
+      );
+      return;
+    }
+
+    const formValue = this.accountForm.getRawValue();
+    const username = String(formValue.name).trim();
+    const email = String(formValue.email).trim();
+
+    if (!username || !email) {
+      this.presentToast(
+        'El nombre y el correo son obligatorios.',
+        'warning'
+      );
+      return;
+    }
+
+    this.savingAccount = true;
+
+    this.userService.updateProfile(user.id, {
+      username,
+      email
+    }).subscribe({
+      next: (response) => {
+        this.savingAccount = false;
+
+        this.authService.updateCurrentUser({
+          username: response.data.username,
+          email: response.data.email
+        });
+
+        this.settingsState.account = {
+          ...this.settingsState.account,
+          name: response.data.username ?? username,
+          email: response.data.email,
+          phone: formValue.phone ?? ''
+        };
+
+        this.accountForm.patchValue({
+          name: response.data.username,
+          email: response.data.email
+        });
+
+        this.presentToast(
+          'Datos de la cuenta actualizados correctamente.',
+          'success'
+        );
+      },
+      error: (error) => {
+        this.savingAccount = false;
+
+        const message =
+          error?.error?.message ??
+          'No se pudieron actualizar los datos de la cuenta.';
+
+        this.presentToast(message, 'danger');
+      }
+    });
   }
+  
 
   changePassword(): void {
     if (this.passwordForm.invalid) {
       this.passwordForm.markAllAsTouched();
+
       const message = this.passwordForm.hasError('passwordMismatch')
         ? 'Las contraseñas nuevas no coinciden.'
         : 'Completá los tres campos (mínimo 6 caracteres).';
+
       this.presentToast(message, 'warning');
       return;
     }
-    // TODO: reemplazar por AuthService.changePassword(...) cuando exista auth real.
-    this.presentToast('Contraseña actualizada localmente (simulado).', 'success');
-    this.passwordForm.reset();
+
+    const user = this.authService.currentUser;
+
+    if (!user) {
+      this.presentToast(
+        'No se encontró una sesión activa. Volvé a iniciar sesión.',
+        'warning'
+      );
+      return;
+    }
+
+    const { currentPassword, newPassword } =
+      this.passwordForm.getRawValue();
+
+    if (currentPassword === newPassword) {
+      this.presentToast(
+        'La nueva contraseña debe ser diferente de la actual.',
+        'warning'
+      );
+      return;
+    }
+
+    this.userService.changePassword(user.id, {
+      currentPassword,
+      newPassword
+    }).subscribe({
+      next: (response) => {
+        this.presentToast(
+          response.message || 'Contraseña actualizada correctamente.',
+          'success'
+        );
+
+        this.passwordForm.reset();
+        this.showPasswordForm = false;
+      },
+      error: (error) => {
+        const message =
+          error?.error?.message ??
+          'No se pudo cambiar la contraseña. Intentá nuevamente.';
+
+        this.presentToast(message, 'danger');
+      }
+    });
   }
 
-  private async presentToast(message: string, color: string): Promise<void> {
-    const toast = await this.toastCtrl.create({ message, duration: 2500, color, position: 'bottom' });
+private async presentToast(
+    message: string,
+    color: string
+  ): Promise<void> {
+    const toast = await this.toastCtrl.create({
+      message,
+      duration: 2500,
+      color,
+      position: 'bottom'
+    });
+
     await toast.present();
   }
 

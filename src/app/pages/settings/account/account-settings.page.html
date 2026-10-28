@@ -88,9 +88,10 @@
         <ion-button
           expand="block"
           class="primary-action"
+          [disabled]="savingAccount"
           (click)="saveAccountInfo()">
           <ion-icon name="save-outline" slot="start"></ion-icon>
-          Guardar cambios
+           {{ savingAccount ? 'Guardando...' : 'Guardar cambios' }}
         </ion-button>
       </div>
     </section>
@@ -117,9 +118,11 @@
     [attr.aria-expanded]="showPasswordForm"
 >
     <ion-icon name="key-outline" class="security-option-icon"></ion-icon>
-      <span class="security-option-label">  Cambiar contraseña  </span>
+    
+    <span class="security-option-label">  Cambiar contraseña  </span>
+    
     <ion-icon
-      [name]="showPasswordForm ? 'chevron-up-outline' : 'chevron-forward-outline'"
+    [name]="showPasswordForm ? 'chevron-up-outline' : 'chevron-forward-outline'"
       class="security-option-arrow"
     ></ion-icon>
   </button>

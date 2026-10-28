@@ -27,6 +27,24 @@ export class AuthService {
     return this.currentUserSubject.value;
   }
 
+  
+  updateCurrentUser(changes: Partial<AuthUser>): void {
+    const current = this.currentUser;
+
+    if (!current) {
+      return;
+    }
+
+    const updated: AuthUser = {
+      ...current,
+      ...changes
+    };
+
+    this.tokenStorage.setUser(updated);
+    this.currentUserSubject.next(updated);
+  }
+
+
   isAuthenticated(): boolean {
     return !!this.tokenStorage.getToken();
   }
