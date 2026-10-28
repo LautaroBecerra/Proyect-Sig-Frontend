@@ -9,7 +9,6 @@ export interface AccountInfo {
 
 export interface NotificationSettings {
   floodAlerts: boolean;
-  rainAlerts: boolean;
   nearbyReportAlerts: boolean;
 }
 

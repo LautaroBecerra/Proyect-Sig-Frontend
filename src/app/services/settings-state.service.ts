@@ -17,7 +17,6 @@ export class SettingsStateService {
 
   notifications: NotificationSettings = {
     floodAlerts: true,
-    rainAlerts: true,
     nearbyReportAlerts: false
   };
 

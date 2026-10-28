@@ -17,14 +17,7 @@
         (ionChange)="toggle('floodAlerts')"
       ></ion-toggle>
     </ion-item>
-    <ion-item>
-      <ion-label>Alertas de lluvias</ion-label>
-      <ion-toggle
-        slot="end"
-        [checked]="settingsState.notifications.rainAlerts"
-        (ionChange)="toggle('rainAlerts')"
-      ></ion-toggle>
-    </ion-item>
+
     <ion-item lines="none">
       <ion-label>Alertas de reportes cercanos</ion-label>
       <ion-toggle
@@ -34,4 +27,38 @@
       ></ion-toggle>
     </ion-item>
   </ion-list>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="rainy-outline"></ion-icon>
+        Alertas meteorológicas
+      </ion-card-title>
+      <ion-card-subtitle>
+        Información oficial del SMN
+      </ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+      Para consultar las alertas meteorológicas oficiales por lluvias
+      intensas, tormentas y otros fenómenos, visitá el sitio web del
+      Servicio Meteorológico Nacional (SMN).
+
+      <ion-button
+        expand="block"
+        class="ion-margin-top"
+        href="https://www.smn.gob.ar/alertas"
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        <ion-icon name="open-outline" slot="start"></ion-icon>
+        Consultar alertas oficiales
+      </ion-button>
+
+      <p class="ion-margin-top">
+        Hidromemoria facilita el acceso a información meteorológica
+        oficial publicada por el SMN.
+      </p>
+    </ion-card-content>
+  </ion-card>
 </ion-content>
