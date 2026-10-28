@@ -57,18 +57,32 @@
     </section>
 
     <section class="reports-section">
-      <div class="section-heading">
-        <h2>Reportes recibidos</h2>
 
-        <ion-button
-          fill="clear"
-          size="small"
-          (click)="filter = 'todos'"
-          [disabled]="filter === 'todos'"
-        >
-          Ver todos
-        </ion-button>
-      </div>
+<div class="section-heading">
+  <h2>Reportes recibidos</h2>
+
+    <div class="section-actions">
+      <ion-button
+        fill="outline"
+        size="small"
+        color="success"
+        (click)="exportToExcel()"
+        [disabled]="loading || reports.length === 0"
+      >
+        <ion-icon name="download-outline" slot="start"></ion-icon>
+        Exportar a Excel
+      </ion-button>
+
+      <ion-button
+        fill="clear"
+        size="small"
+        (click)="filter = 'todos'"
+        [disabled]="filter === 'todos'"
+      >
+        Ver todos
+      </ion-button>
+    </div>
+  </div>
 
       <ion-segment
         [value]="filter"

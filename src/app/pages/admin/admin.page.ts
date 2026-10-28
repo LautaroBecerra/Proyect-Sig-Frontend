@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { IonicModule, AlertController, ToastController } from '@ionic/angular';
 import { FloodReportService } from '../../services/flood-report.service';
 import { FloodReport } from '../../models/flood-report.model';
+import * as XLSX from 'xlsx';
 
 type ReportStatus = 'pendiente' | 'aprobado' | 'rechazado';
 type StatusFilter = 'todos' | ReportStatus;
@@ -74,6 +75,50 @@ export class AdminPage implements OnInit {
         this.loading = false;
       },
     });
+  }
+
+  
+  exportToExcel(): void {
+    if (this.reports.length === 0) {
+      this.showToast('No hay reportes para exportar.');
+      return;
+    }
+
+    const data = this.reports.map(report => ({
+      'ID del reporte': report.id,
+      'Fecha de creación': this.formatDate(report.created_at),
+      'Estado': report.status,
+      'Descripción': report.description || 'Sin descripción',
+      'Gravedad': report.severity || 'No especificada',
+      'Tipo de incidente': report.incident_type || 'No especificado',
+      'Profundidad del agua': report.water_depth_range || 'No especificada',
+      'ID de usuario': report.user_id,
+      'Latitud': report.latitude,
+      'Longitud': report.longitude,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+
+    worksheet['!cols'] = [
+      { wch: 15 },
+      { wch: 22 },
+      { wch: 15 },
+      { wch: 40 },
+      { wch: 18 },
+      { wch: 24 },
+      { wch: 24 },
+      { wch: 15 },
+      { wch: 15 },
+      { wch: 15 },
+    ];
+
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Reportes');
+
+    const fecha = new Date().toISOString().slice(0, 10);
+    XLSX.writeFile(workbook, `Hidromemoria_Reportes_${fecha}.xlsx`);
+
+    this.showToast('Archivo Excel generado correctamente.');
   }
 
   async changeStatus(
