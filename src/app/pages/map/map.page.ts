@@ -15,7 +15,8 @@ import { MapMarkerInfoComponent } from '../../shared/components/map-marker-info/
 import { FloodReportFormComponent } from '../../shared/components/flood-report-form/flood-report-form.component';
 import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
-
+import { interval } from 'rxjs';
+import {NotificationService, Notification as AppNotification} from '../../services/notification.service';
 
 // Fix conocido: Leaflet + bundlers modernos rompen las rutas de los íconos default.
 // Los archivos referenciados abajo se copian a src/assets/leaflet (ver README).
@@ -26,10 +27,6 @@ L.Icon.Default.mergeOptions({
   shadowUrl: 'assets/leaflet/marker-shadow.png'
 });
 
-// ⚠️ Nota: hasta hace poco acá creábamos reportes reales contra el backend
-// (con un user_id "temporal" mientras no había login). El formulario nuevo
-// (FloodReportFormComponent) todavía es 100% mock/frontend — ver el TODO
-// en openCreateReportForm() para cuándo se vuelve a conectar de verdad.
 
 @Component({
   selector: 'app-map',
@@ -46,11 +43,10 @@ export class MapPage implements AfterViewInit, OnDestroy {
   private reportsRefreshInterval?: ReturnType<typeof setInterval>;
   private resizeObserver?: ResizeObserver;
   private searchSubscription?: Subscription;
+  private notificationPolling?: Subscription;
+
 
   selectingLocation = false;
-
-  // Qué botón circular de abajo está presionado ahora mismo, para mostrarle
-  // su tooltip ("Reportar inundación" / "Mi ubicación") mientras lo tocan.
   pressedButton: 'report' | 'locate' | null = null;
   loading = false;
 
@@ -58,8 +54,11 @@ export class MapPage implements AfterViewInit, OnDestroy {
   searchResults: GeocodingResult[] = [];
   showSearchResults = false;
 
-  // Centro de Venado Tuerto, Santa Fe (WGS84). Se usa mientras se obtiene
-  // la ubicación real del usuario, o si el navegador no da permiso.
+  notifications: AppNotification[] = [];
+  unreadNotifications = 0;
+  showNotifications = false;
+  respondingNotificationId: number | null = null;
+  
   private readonly defaultCenter: [number, number] = [-33.7458, -61.9671];
 
   constructor(
@@ -69,26 +68,35 @@ export class MapPage implements AfterViewInit, OnDestroy {
     private toastCtrl: ToastController,
     private modalCtrl: ModalController,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {}
 
   async ngAfterViewInit(): Promise<void> {
     this.initMap();
     await this.centerOnUser();
     this.loadReports();
-    this.reportsRefreshInterval = setInterval(() => {
+     this.reportsRefreshInterval = setInterval(() => {
     this.loadReports();
       }, 20000);
     this.initSearch();
+    this.loadNotifications();
+
+  if (this.authService.isAuthenticated()) {
+      this.notificationPolling = interval(60000).subscribe(() => {
+      this.loadNotifications();
+      });
+    }
   }
 
   ngOnDestroy(): void {
     if (this.reportsRefreshInterval) {
       clearInterval(this.reportsRefreshInterval);
-     }
+    }
     this.resizeObserver?.disconnect();
     this.searchSubscription?.unsubscribe();
     this.map?.remove();
+    this.notificationPolling?.unsubscribe();
   }
 
   // Pipeline de búsqueda: espera que el usuario deje de tipear (debounce),
@@ -116,6 +124,37 @@ export class MapPage implements AfterViewInit, OnDestroy {
         this.searchResults = results;
         this.showSearchResults = results.length > 0;
       });
+  }
+
+  respondToNotification(notification: AppNotification, problemPersists: boolean): void {
+    if (this.respondingNotificationId !== null) {
+      return;
+    }
+
+    this.respondingNotificationId = notification.id;
+
+    this.floodReportService.confirmReport(
+      notification.flood_report_id,
+      problemPersists,
+      notification.id
+    ).subscribe({
+      next: () => {
+        this.respondingNotificationId = null;
+
+        const message = problemPersists
+          ? 'Gracias por confirmar. Volveremos a consultarte en 3 días.'
+          : '¡Gracias! El reporte fue marcado como solucionado.';
+
+        this.presentToast(message, 'success');
+
+        this.loadNotifications();
+        this.loadReports();
+      },
+      error: (error) => {
+        this.respondingNotificationId = null;
+        this.handleHttpError(error);
+      }
+    });
   }
 
   selectSearchResult(result: GeocodingResult): void {
@@ -217,11 +256,6 @@ export class MapPage implements AfterViewInit, OnDestroy {
   }
 
   private async showReportInfo(report: FloodReport): Promise<void> {
-    // Antes esto era un ion-alert con HTML metido a mano en el "message"
-    // (los ion-alert no renderizan HTML por defecto, por eso se veían las
-    // etiquetas <b>/<br> literales). Ahora es un modal propio, con diseño
-    // de hoja inferior (bottom sheet), igual que al tocar un lugar en
-    // Google Maps.
     const modal = await this.modalCtrl.create({
       component: MapMarkerInfoComponent,
       componentProps: { report },
@@ -284,6 +318,7 @@ private async openCreateReportForm(latlng: L.LatLng): Promise<void> {
     if (role !== 'submitted' || !data) {
       return;
     }
+
     const user = this.authService.currentUser;
     const userId = Number(user?.id);
 
@@ -294,6 +329,7 @@ private async openCreateReportForm(latlng: L.LatLng): Promise<void> {
       );
       return;
     }
+
     if (
       latitude === undefined ||
       longitude === undefined ||
@@ -307,54 +343,15 @@ private async openCreateReportForm(latlng: L.LatLng): Promise<void> {
       return;
     }
 
-    const incidentLabels: Record<string, string> = {
-      calle_con_agua: 'Calle con agua',
-      calle_cortada: 'Calle cortada',
-      calle_erosionada: 'Calle erosionada o socavada',
-      agua_en_viviendas: 'Agua dentro de viviendas',
-      boca_tormenta_obstruida: 'Boca de tormenta obstruida',
-      canal_desbordado: 'Canal o zanja desbordada'
-  };
-
-    const waterDepthLabels: Record<string, string> = {
-      '0_5': '0 a 5 cm',
-      '5_20': '5 a 20 cm',
-      '20_50': '20 a 50 cm',
-      '50_100': '50 cm a 1 m',
-      mas_100: 'Más de 1 m'
-  };
-
-    const selectedIncidents = data.tipoIncidente
-      .map((key) => incidentLabels[key])
-      .filter((label): label is string => Boolean(label));
-
-    if (selectedIncidents.length === 0) {
-     this.presentToast(
-        'Seleccioná al menos un tipo de incidente válido.',
-        'warning'
-      );
-     return;
-  }
-
-  // El backend admite un solo incident_type.
-  // Por ahora enviamos el primero seleccionado.
     const payload = {
       user_id: userId,
       latitude,
       longitude,
-      description: data.descripcion.trim(),
-      incident_type: selectedIncidents[0],
-      water_depth_range: data.rangoTirante
-      ? waterDepthLabels[data.rangoTirante]
-      : undefined,
-      problem_persists:
-      data.problemaPresente === 'si'
-        ? true
-        : data.problemaPresente === 'no'
-          ? false
-          : undefined
-  };
+      description: data.descripcion
+    };
+
     this.loading = true;
+
     this.floodReportService.createReport(payload).subscribe({
       next: () => {
         this.loading = false;
@@ -397,5 +394,58 @@ private async openCreateReportForm(latlng: L.LatLng): Promise<void> {
       position: 'bottom'
     });
     await toast.present();
+  }
+
+    private loadNotifications(): void {
+       console.log('Ejecutando loadNotifications()');
+
+    if (!this.authService.isAuthenticated()) {
+       console.log('Usuario no autenticado');
+      this.notifications = [];
+      this.unreadNotifications = 0;
+      return;
+    }
+
+    this.notificationService.getNotifications().subscribe({
+      next: (notifications) => {
+            console.log('NOTIFICACIONES RECIBIDAS:', notifications);
+        this.notifications = notifications;
+        this.unreadNotifications = notifications.filter(
+          notification => !notification.is_read
+        ).length;
+      },
+      error: (error) => {
+        console.error('Error loading notifications:', error);
+      }
+    });
+  }
+
+  toggleNotifications(): void {
+    this.showNotifications = !this.showNotifications;
+    console.log('Estado:', this.showNotifications);
+      if (this.showNotifications) {
+    this.loadNotifications();
+  }
+  }
+
+  markNotificationAsRead(notification: AppNotification): void {
+    if (notification.is_read) return;
+
+    this.notificationService.markAsRead(notification.id).subscribe({
+      next: () => {
+        notification.is_read = true;
+
+        this.unreadNotifications = this.notifications.filter(
+          item => !item.is_read
+        ).length;
+      },
+      error: (error) => {
+        console.error('Error marking notification as read:', error);
+      }
+    });
+  }
+
+  closeNotifications(): void {
+  this.showNotifications = false;
   }
 }

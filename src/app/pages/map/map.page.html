@@ -14,10 +14,130 @@
       class="topbar-search"
     ></ion-searchbar>
 
+    <ion-button
+      fill="clear"
+      class="topbar-icon notification-button"
+      (click)="toggleNotifications()">
+
+      <ion-icon slot="icon-only" name="notifications-outline"></ion-icon>
+
+      <ion-badge
+        *ngIf="unreadNotifications > 0"
+        color="danger"
+        class="notification-badge">
+        {{ unreadNotifications }}
+      </ion-badge>
+    </ion-button>
+
     <ion-button fill="clear" class="topbar-icon" (click)="refreshReports()">
       <ion-icon slot="icon-only" name="refresh-outline"></ion-icon>
     </ion-button>
   </div>
+
+  <div
+    class="notifications-backdrop"
+    *ngIf="showNotifications"
+    (click)="closeNotifications()">
+  </div>
+  <!-- Panel de notificaciones -->
+  <div class="notifications-panel" *ngIf="showNotifications">
+
+  <div class="notifications-header">
+    <div>
+      <h3>Notificaciones</h3>
+      <span>{{ unreadNotifications }} sin leer</span>
+    </div>
+
+    <ion-button
+      fill="clear"
+      class="close-notifications"
+      (click)="toggleNotifications()">
+      <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+    </ion-button>
+  </div>
+
+  <div class="notifications-content">
+
+    <div *ngIf="notifications.length === 0" class="empty-notifications">
+      <ion-icon name="notifications-outline"></ion-icon>
+      <h4>Todo tranquilo por acá</h4>
+      <p>Cuando tengas novedades, aparecerán aquí.</p>
+    </div>
+
+    <div
+      class="notification-item"
+      *ngFor="let notification of notifications"
+      [class.notification-unread]="!notification.is_read">
+
+      <div class="notification-item-header">
+        <div class="notification-title">
+          <span class="notification-dot" *ngIf="!notification.is_read"></span>
+          <strong>{{ notification.title }}</strong>
+        </div>
+        <span class="notification-date">
+          {{ notification.created_at | date:'dd/MM HH:mm' }}
+        </span>
+      </div>
+
+      <p>{{ notification.message }}</p>
+
+        <div class="notification-report-info">
+    <div class="notification-report-id">
+      <ion-icon name="document-text-outline"></ion-icon>
+      <strong>Reporte #{{ notification.flood_report_id }}</strong>
+    </div>
+
+    <p class="notification-report-description"
+      *ngIf="notification.report_description">
+      {{ notification.report_description }}
+    </p>
+
+    <span class="notification-report-type"
+          *ngIf="notification.report_incident_type">
+      {{ notification.report_incident_type }}
+    </span>
+
+    <div class="notification-report-location">
+      <ion-icon name="location-outline"></ion-icon>
+      <span>
+        {{ notification.report_latitude }},
+        {{ notification.report_longitude }}
+      </span>
+    </div>
+  </div>
+
+      <div
+        class="notification-actions"
+        *ngIf="notification.type === 'flood_confirmation' && !notification.responded_at">
+
+        <ion-button
+          size="small"
+          fill="solid"
+          color="success"
+          [disabled]="respondingNotificationId === notification.id"
+          (click)="respondToNotification(notification, true)">
+          Sí, continúa
+        </ion-button>
+
+        <ion-button
+          size="small"
+          fill="outline"
+          color="medium"
+          [disabled]="respondingNotificationId === notification.id"
+          (click)="respondToNotification(notification, false)">
+          Ya se solucionó
+        </ion-button>
+
+      </div>
+
+      <div *ngIf="notification.responded_at" class="notification-answered">
+        <ion-icon name="checkmark-circle-outline"></ion-icon>
+        <span>Respuesta registrada</span>
+      </div>
+
+    </div>
+  </div>
+</div>
 
   <ion-list *ngIf="showSearchResults" class="search-results" lines="full">
     <ion-item *ngFor="let result of searchResults" button (click)="selectSearchResult(result)">

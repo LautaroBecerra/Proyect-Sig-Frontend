@@ -124,3 +124,267 @@
     transform: translate(-50%, 0);
   }
 }
+
+.notifications-panel {
+  position: fixed;
+  top: calc(env(safe-area-inset-top, 0px) + 72px);
+  right: 12px;
+  width: min(390px, calc(100vw - 24px));
+  max-height: min(520px, calc(100vh - 110px));
+  z-index: 99999;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #ffffff;
+  border: 1px solid #eaecef;
+  border-radius: 16px;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.14);
+
+  overflow: hidden;
+  animation: notification-appear 0.18s ease-out;
+}
+
+.notifications-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 17px 18px;
+  border-bottom: 1px solid #f0f1f3;
+
+  h3 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 650;
+    color: #202124;
+  }
+
+  span {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+    color: #858b95;
+  }
+}
+
+.close-notifications {
+  margin: 0;
+  --color: #777e89;
+  --background-hover: #f3f4f6;
+}
+
+.notifications-content {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 6px 10px;
+}
+
+.notification-item {
+  padding: 14px 10px;
+  border-bottom: 1px solid #f0f1f3;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  p {
+    margin: 8px 0 0;
+    font-size: 13px;
+    line-height: 1.5;
+    color: #626975;
+  }
+}
+
+.notification-unread {
+  background: #f8faff;
+  border-radius: 10px;
+}
+
+.notification-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.notification-title {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+
+  strong {
+    font-size: 13px;
+    font-weight: 600;
+    color: #292e36;
+  }
+}
+
+.notification-dot {
+  width: 7px;
+  height: 7px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #3880ff;
+}
+
+.notification-date {
+  font-size: 10px;
+  color: #999faa;
+  white-space: nowrap;
+}
+
+.notification-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+
+  ion-button {
+    margin: 0;
+    height: 32px;
+    font-size: 11px;
+    font-weight: 600;
+    --border-radius: 8px;
+  }
+}
+
+.notification-answered {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  color: #27945d;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.empty-notifications {
+  padding: 38px 18px;
+  text-align: center;
+
+  ion-icon {
+    font-size: 32px;
+    color: #aeb5c0;
+  }
+
+  h4 {
+    margin: 12px 0 5px;
+    font-size: 14px;
+    font-weight: 600;
+    color: #343a44;
+  }
+
+  p {
+    margin: 0;
+    font-size: 12px;
+    color: #9299a4;
+  }
+}
+
+@keyframes notification-appear {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.notifications-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 99998;
+  background: transparent;
+}
+
+.notifications-panel {
+  z-index: 99999;
+}
+
+.notification-button {
+  position: relative;
+  overflow: visible;
+}
+
+.notification-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  transform: translate(30%, -30%);
+
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 2px solid #ffffff;
+  border-radius: 20px;
+
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  z-index: 10;
+}
+
+
+.notification-report-info {
+  margin-top: 12px;
+  padding: 11px 12px;
+  background: #f7f8fa;
+  border: 1px solid #eceef2;
+  border-radius: 10px;
+}
+
+.notification-report-id {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #3b4655;
+
+  ion-icon {
+    font-size: 16px;
+    color: #64748b;
+  }
+
+  strong {
+    font-size: 12px;
+    font-weight: 650;
+  }
+}
+
+.notification-report-description {
+  margin: 8px 0 0 !important;
+  font-size: 12px !important;
+  color: #4b5563 !important;
+}
+
+.notification-report-type {
+  display: inline-block;
+  margin-top: 7px;
+  padding: 3px 7px;
+  background: #e8efff;
+  color: #315db5;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.notification-report-location {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 9px;
+  color: #858b95;
+  font-size: 10px;
+
+  ion-icon {
+    font-size: 13px;
+  }
+}

@@ -3,11 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
-import {
-  ApiResponse,
-  CreateFloodReportDto,
-  FloodReport,
-  UpdateFloodReportDto
+import {ApiResponse, CreateFloodReportDto, FloodReport, UpdateFloodReportDto
 } from '../models/flood-report.model';
 
 // Endpoints confirmados contra flood.reports.controller.ts / flood.reports.routes.ts:
@@ -68,6 +64,22 @@ export class FloodReportService {
   updateReport(id: number, report: UpdateFloodReportDto): Observable<FloodReport> {
     return this.http
       .put<ApiResponse<FloodReport>>(`${this.baseUrl}/${id}`, report)
+      .pipe(map(res => res.data));
+  }
+
+  confirmReport(
+    id: number,
+    problemPersists: boolean,
+    notificationId?: number
+  ): Observable<FloodReport> {
+    return this.http.patch<ApiResponse<FloodReport>>(
+        `${this.baseUrl}/${id}/confirm`,
+        {
+          problem_persists: problemPersists, ...(notificationId !== undefined
+            ? { notification_id: notificationId }
+            : {})
+        }
+      )
       .pipe(map(res => res.data));
   }
 
