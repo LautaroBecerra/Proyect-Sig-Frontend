@@ -97,12 +97,28 @@
       {{ notification.report_incident_type }}
     </span>
 
-    <div class="notification-report-location">
+    <div
+      class="notification-report-location"
+      role="button"
+      tabindex="0"
+      (click)="goToReportLocation(
+        notification.report_latitude,
+        notification.report_longitude,
+        notification.flood_report_id
+      )"
+      (keydown.enter)="goToReportLocation(
+        notification.report_latitude,
+        notification.report_longitude,
+        notification.flood_report_id
+      )">
+
       <ion-icon name="location-outline"></ion-icon>
+
       <span>
-        {{ notification.report_latitude }},
-        {{ notification.report_longitude }}
+        Ver ubicación en el mapa
       </span>
+
+      <ion-icon name="arrow-forward-outline"></ion-icon>
     </div>
   </div>
 

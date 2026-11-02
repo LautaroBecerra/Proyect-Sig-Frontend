@@ -40,6 +40,7 @@ export class MapPage implements AfterViewInit, OnDestroy {
   private userMarker?: L.Marker;
   private searchMarker?: L.Marker;
   private reportMarkers: L.Marker[] = [];
+  private reports: FloodReport[] = [];
   private reportsRefreshInterval?: ReturnType<typeof setInterval>;
   private resizeObserver?: ResizeObserver;
   private searchSubscription?: Subscription;
@@ -245,12 +246,15 @@ export class MapPage implements AfterViewInit, OnDestroy {
 
   private renderReports(reports: FloodReport[]): void {
     this.reportMarkers.forEach(marker => this.map.removeLayer(marker));
+
     this.reportMarkers = [];
+    this.reports = reports;
 
     reports.forEach(report => {
       const marker = L.marker([report.latitude, report.longitude])
         .addTo(this.map)
         .on('click', () => this.showReportInfo(report));
+
       this.reportMarkers.push(marker);
     });
   }
@@ -447,5 +451,29 @@ private async openCreateReportForm(latlng: L.LatLng): Promise<void> {
 
   closeNotifications(): void {
   this.showNotifications = false;
+  }
+
+  goToReportLocation(
+    latitude: number,
+    longitude: number,
+    reportId: number
+  ): void {
+    this.closeNotifications();
+
+    this.map.setView([latitude, longitude], 17);
+
+    const report = this.reports.find(
+      item => Number(item.id) === Number(reportId)
+    );
+
+    if (report) {
+      this.showReportInfo(report);
+    } else {
+      this.presentToast(
+        'No se encontró el reporte en el mapa. Actualizá los reportes e intentá nuevamente.',
+        'warning'
+      );
+      this.loadReports();
+    }
   }
 }
