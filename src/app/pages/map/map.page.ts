@@ -1,7 +1,7 @@
 import { AfterViewInit, Component, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { IonicModule, ToastController, ModalController } from '@ionic/angular';
+import { IonicModule, ToastController, ModalController, AlertController } from '@ionic/angular';
 import { Subscription, of } from 'rxjs';
 import { catchError, debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import * as L from 'leaflet';
@@ -17,6 +17,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
 import { interval } from 'rxjs';
 import {NotificationService, Notification as AppNotification} from '../../services/notification.service';
+
 
 // Fix conocido: Leaflet + bundlers modernos rompen las rutas de los íconos default.
 // Los archivos referenciados abajo se copian a src/assets/leaflet (ver README).
@@ -70,7 +71,8 @@ export class MapPage implements AfterViewInit, OnDestroy {
     private modalCtrl: ModalController,
     private authService: AuthService,
     private router: Router,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private alertCtrl: AlertController
   ) {}
 
   async ngAfterViewInit(): Promise<void> {
@@ -475,5 +477,53 @@ private async openCreateReportForm(latlng: L.LatLng): Promise<void> {
       );
       this.loadReports();
     }
+  }
+
+  async confirmDeleteNotifications(): Promise<void> {
+
+    if (!this.notifications.length) {
+      this.presentToast('No hay notificaciones para eliminar.', 'warning');
+      return;
+    }
+
+    const alert = await this.alertCtrl.create({
+      header: 'Borrar historial',
+      message: '¿Estás seguro de que querés eliminar todas tus notificaciones? Esta acción no se puede deshacer.',
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel'
+        },
+        {
+          text: 'Eliminar todo',
+          role: 'destructive',
+          handler: () => {
+            this.deleteAllNotifications();
+          }
+        }
+      ]
+    });
+
+    await alert.present();
+  }
+
+  private deleteAllNotifications(): void {
+    this.notificationService.deleteAll().subscribe({
+      next: (response) => {
+
+        this.notifications = [];
+        this.unreadNotifications = 0;
+
+        this.presentToast(
+          `Se eliminaron ${response.deletedCount} notificaciones.`,
+          'success'
+        );
+
+      },
+      error: (error) => {
+        console.error('Error deleting notifications:', error);
+        this.handleHttpError(error);
+      }
+    });
   }
 }

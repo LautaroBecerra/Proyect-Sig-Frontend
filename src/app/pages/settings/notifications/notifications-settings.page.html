@@ -3,62 +3,163 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/settings"></ion-back-button>
     </ion-buttons>
+
     <ion-title>Notificaciones</ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content>
-  <ion-list>
-    <ion-item>
-      <ion-label>Alertas de inundaciones</ion-label>
-      <ion-toggle
-        slot="end"
-        [checked]="settingsState.notifications.floodAlerts"
-        (ionChange)="toggle('floodAlerts')"
-      ></ion-toggle>
-    </ion-item>
 
-    <ion-item lines="none">
-      <ion-label>Alertas de reportes cercanos</ion-label>
-      <ion-toggle
-        slot="end"
-        [checked]="settingsState.notifications.nearbyReportAlerts"
-        (ionChange)="toggle('nearbyReportAlerts')"
-      ></ion-toggle>
-    </ion-item>
-  </ion-list>
+  <!-- Preferencias -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="options-outline"></ion-icon>
+        Preferencias
+      </ion-card-title>
+      <ion-card-subtitle>
+        Configurá qué notificaciones querés recibir
+      </ion-card-subtitle>
+    </ion-card-header>
 
+    <ion-card-content>
+      <ion-item lines="none">
+        <ion-label>
+          <h2>Alertas de inundaciones</h2>
+          <p>Recibir avisos relacionados con inundaciones.</p>
+        </ion-label>
+        <ion-toggle
+          slot="end"
+          [checked]="settingsState.notifications.floodAlerts"
+          (ionChange)="toggle('floodAlerts')">
+        </ion-toggle>
+      </ion-item>
+
+      <ion-item lines="none">
+        <ion-label>
+          <h2>Reportes cercanos</h2>
+          <p>Recibir alertas sobre reportes próximos.</p>
+        </ion-label>
+        <ion-toggle
+          slot="end"
+          [checked]="settingsState.notifications.nearbyReportAlerts"
+          (ionChange)="toggle('nearbyReportAlerts')">
+        </ion-toggle>
+      </ion-item>
+    </ion-card-content>
+  </ion-card>
+
+<!-- Historial -->
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>
+        <ion-icon name="notifications-outline"></ion-icon>
+        Historial
+      </ion-card-title>
+
+      <ion-card-subtitle>
+        {{ unreadNotifications }} notificaciones sin leer
+      </ion-card-subtitle>
+    </ion-card-header>
+
+    <ion-card-content>
+
+      <div class="history-header">
+        <p>Notificaciones recibidas</p>
+
+        <ion-button
+          fill="clear"
+          color="danger"
+          size="small"
+          [disabled]="notifications.length === 0 || deletingNotifications"
+          (click)="confirmDeleteNotifications()">
+          <ion-icon name="trash-outline" slot="start"></ion-icon>
+          Borrar historial
+        </ion-button>
+      </div>
+
+      <div *ngIf="loadingNotifications" class="ion-text-center ion-padding">
+        <ion-spinner></ion-spinner>
+        <p>Cargando notificaciones...</p>
+      </div>
+
+      <div
+        *ngIf="!loadingNotifications && notifications.length === 0"
+        class="empty-history">
+        <ion-icon name="notifications-outline"></ion-icon>
+        <h4>Todo tranquilo por acá</h4>
+        <p>Cuando tengas novedades, aparecerán aquí.</p>
+      </div>
+
+      <div
+        *ngFor="let notification of notifications"
+        class="history-notification"
+        [class.notification-unread]="!notification.is_read">
+
+        <div class="history-notification-title">
+          <ion-icon
+            [name]="notification.is_read
+              ? 'mail-open-outline'
+              : 'mail-unread-outline'">
+          </ion-icon>
+
+          <strong>{{ notification.title }}</strong>
+        </div>
+
+        <p>{{ notification.message }}</p>
+
+        <div class="history-notification-footer">
+          <span>
+            Reporte #{{ notification.flood_report_id }}
+          </span>
+
+          <span>
+            {{ notification.created_at | date:'dd/MM/yyyy HH:mm' }}
+          </span>
+        </div>
+
+        <ion-button
+          *ngIf="!notification.is_read"
+          fill="outline"
+          size="small"
+          (click)="markAsRead(notification)">
+          <ion-icon name="checkmark-outline" slot="start"></ion-icon>
+          Marcar como leída
+        </ion-button>
+
+      </div>
+
+    </ion-card-content>
+  </ion-card>
+
+  <!-- SMN -->
   <ion-card>
     <ion-card-header>
       <ion-card-title>
         <ion-icon name="rainy-outline"></ion-icon>
         Alertas meteorológicas
       </ion-card-title>
+
       <ion-card-subtitle>
         Información oficial del SMN
       </ion-card-subtitle>
     </ion-card-header>
 
     <ion-card-content>
-      Para consultar las alertas meteorológicas oficiales por lluvias
-      intensas, tormentas y otros fenómenos, visitá el sitio web del
-      Servicio Meteorológico Nacional (SMN).
+      Para consultar alertas oficiales por lluvias intensas,
+      tormentas y otros fenómenos, visitá el Servicio
+      Meteorológico Nacional.
 
       <ion-button
         expand="block"
         class="ion-margin-top"
         href="https://www.smn.gob.ar/alertas"
         target="_blank"
-        rel="noopener noreferrer"
-      >
+        rel="noopener noreferrer">
         <ion-icon name="open-outline" slot="start"></ion-icon>
         Consultar alertas oficiales
       </ion-button>
-
-      <p class="ion-margin-top">
-        Hidromemoria facilita el acceso a información meteorológica
-        oficial publicada por el SMN.
-      </p>
     </ion-card-content>
   </ion-card>
+
 </ion-content>

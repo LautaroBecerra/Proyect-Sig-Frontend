@@ -44,4 +44,10 @@ export class NotificationService {
     return this.http
       .patch<void>(`${this.baseUrl}/${id}/read`, {});
   }
+
+  deleteAll(): Observable<{ deletedCount: number }> {
+    return this.http
+      .delete<ApiResponse<{ deletedCount: number }>>(this.baseUrl)
+      .pipe(map(res => res.data));
+  }
 }

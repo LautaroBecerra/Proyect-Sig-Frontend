@@ -42,18 +42,30 @@
   <!-- Panel de notificaciones -->
   <div class="notifications-panel" *ngIf="showNotifications">
 
-  <div class="notifications-header">
+<div class="notifications-header">
     <div>
       <h3>Notificaciones</h3>
       <span>{{ unreadNotifications }} sin leer</span>
     </div>
 
-    <ion-button
-      fill="clear"
-      class="close-notifications"
-      (click)="toggleNotifications()">
-      <ion-icon slot="icon-only" name="close-outline"></ion-icon>
-    </ion-button>
+    <div class="notifications-header-actions">
+      <ion-button
+        fill="clear"
+        color="danger"
+        size="small"
+        (click)="confirmDeleteNotifications()"
+        [disabled]="notifications.length === 0">
+        <ion-icon slot="start" name="trash-outline"></ion-icon>
+        Borrar historial
+      </ion-button>
+
+      <ion-button
+        fill="clear"
+        class="close-notifications"
+        (click)="toggleNotifications()">
+        <ion-icon slot="icon-only" name="close-outline"></ion-icon>
+      </ion-button>
+    </div>
   </div>
 
   <div class="notifications-content">
