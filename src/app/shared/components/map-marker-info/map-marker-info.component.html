@@ -39,6 +39,22 @@
     </p>
   </div>
 
+  <!-- Fotografías del reporte -->
+  <div class="report-photos" *ngIf="report.images?.length">
+
+    <h3>Fotografías del reporte</h3>
+
+    <div class="photos-grid">
+      <img
+        *ngFor="let image of report.images"
+        [src]="imageUrl(image.url)"
+        [alt]="'Fotografía del reporte ' + report.id"
+        loading="lazy"
+      />
+    </div>
+
+  </div>
+
   <div class="report-details">
     <h3>Detalles del incidente</h3>
 

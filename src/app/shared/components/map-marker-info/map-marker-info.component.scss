@@ -8,6 +8,11 @@
   background: var(--ion-background-color, #fff);
   border-radius: 26px 26px 0 0;
   box-shadow: 0 -5px 24px rgba(25, 45, 65, 0.09);
+   max-height: 90vh;
+  max-height: 90dvh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: contain;
 }
 
 .sheet-handle {

@@ -79,5 +79,5 @@ export interface FloodReportFormValue {
     asistenciaNecesaria: AsistenciaNecesaria[];
   };
 
-  fotografia: File | null;
+  fotografias: File[];
 }

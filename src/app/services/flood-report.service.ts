@@ -55,7 +55,7 @@ export class FloodReportService {
       .pipe(map(res => res.data));
   }
 
-  createReport(report: CreateFloodReportDto): Observable<FloodReport> {
+  createReport(report: FormData): Observable<FloodReport> {
     return this.http
       .post<ApiResponse<FloodReport>>(this.baseUrl, report)
       .pipe(map(res => res.data));

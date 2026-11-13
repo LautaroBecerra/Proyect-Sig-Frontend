@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { IonicModule, ModalController } from '@ionic/angular';
 import { FloodReport } from '../../../models/flood-report.model';
 import { getSeverityMeta, SeverityMeta } from '../../utils/severity.util';
+import { environment } from '../../../../environments/environment';
 
 // Componente reutilizable (ver arquitectura del proyecto: shared/components).
 // Se usa desde MapPage vía ModalController cada vez que se toca un marcador.
@@ -34,5 +35,10 @@ export class MapMarkerInfoComponent {
 
   dismiss(): void {
     this.modalCtrl.dismiss();
+  }
+
+  imageUrl(path: string): string {
+  const serverUrl = environment.apiUrl.replace(/\/api\/?$/, '');
+  return `${serverUrl}${path.startsWith('/') ? path : '/' + path}`;
   }
 }

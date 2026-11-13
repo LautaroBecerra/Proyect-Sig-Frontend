@@ -337,32 +337,60 @@
       </div>
     </section>
 
-    <!-- Fotografía -->
-    <section class="form-section">
-      <h2>📷 Adjuntar fotografía (opcional)</h2>
+    <!-- Fotografías -->
+  <section class="form-section">
+    <h2>📷 Adjuntar fotografías (opcional)</h2>
 
-      <input
-        type="file"
-        accept="image/*"
-        id="photo-input"
-        class="photo-input-hidden"
-        (change)="onPhotoSelected($event)"
-      />
+    <p class="section-hint">
+      Podés adjuntar hasta 5 fotografías. Máximo 5 MB por imagen.
+    </p>
 
-      <div class="photo-preview" *ngIf="photoPreviewUrl; else noPhoto">
-        <img [src]="photoPreviewUrl" alt="Vista previa de la fotografía" />
-        <ion-button fill="clear" color="danger" size="small" (click)="removePhoto()">
-          <ion-icon slot="start" name="trash-outline"></ion-icon>
-          Quitar foto
-        </ion-button>
+    <div class="photo-picker-container">
+
+      <!-- Fotografías seleccionadas -->
+      <div
+        class="photo-thumbnail"
+        *ngFor="let preview of photoPreviewUrls; let i = index"
+      >
+        <img
+          [src]="preview"
+          [alt]="'Fotografía ' + (i + 1)"
+        />
+
+        <button
+          type="button"
+          class="photo-remove"
+          (click)="removePhoto(i)"
+        >
+          <ion-icon name="close-circle"></ion-icon>
+        </button>
       </div>
-      <ng-template #noPhoto>
-        <label for="photo-input" class="photo-picker">
-          <ion-icon name="camera-outline"></ion-icon>
-          <span>Elegir una fotografía</span>
-        </label>
-      </ng-template>
-    </section>
+
+      <!-- Botón agregar fotografía -->
+      <label
+        for="photo-input"
+        class="photo-picker"
+        *ngIf="photoPreviewUrls.length < 5"
+      >
+        <ion-icon name="camera-outline"></ion-icon>
+        <span>Agregar foto</span>
+      </label>
+
+    </div>
+
+    <input
+      type="file"
+      accept="image/jpeg,image/png,image/webp"
+      multiple
+      id="photo-input"
+      class="photo-input-hidden"
+      (change)="onPhotosSelected($event)"
+    />
+
+    <p class="section-hint" *ngIf="photoPreviewUrls.length > 0">
+      {{ photoPreviewUrls.length }} de 5 fotografías seleccionadas.
+    </p>
+  </section>
 
     <!-- Nota de contacto -->
     <p class="contact-note">

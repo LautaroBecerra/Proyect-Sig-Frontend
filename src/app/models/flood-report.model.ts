@@ -23,6 +23,18 @@ export interface FloodReport {
 
   status: 'pendiente' | 'aprobado' | 'rechazado';
   created_at: string;
+  images?: FloodReportImage[];
+}
+
+export interface FloodReportImage {
+  id: number;
+  flood_report_id: number;
+  file_name: string;
+  storage_path: string;
+  mime_type: string;
+  size_bytes: number;
+  created_at: string;
+  url: string;
 }
 export interface CreateFloodReportDto {
   user_id: number;

@@ -315,64 +315,175 @@ private async openCreateReportForm(latlng: L.LatLng): Promise<void> {
   await modal.present();
 }
 
-  private handleReportFormResult(
-    data: FloodReportFormValue | null,
-    role?: string,
-    latitude?: number,
-    longitude?: number
-  ): void {
-    if (role !== 'submitted' || !data) {
-      return;
-    }
-
-    const user = this.authService.currentUser;
-    const userId = Number(user?.id);
-
-    if (!Number.isInteger(userId) || userId <= 0) {
-      this.presentToast(
-        'No se pudo identificar tu usuario. Iniciá sesión nuevamente.',
-        'danger'
-      );
-      return;
-    }
-
-    if (
-      latitude === undefined ||
-      longitude === undefined ||
-      !Number.isFinite(latitude) ||
-      !Number.isFinite(longitude)
-    ) {
-      this.presentToast(
-        'No se pudieron obtener las coordenadas del reporte.',
-        'danger'
-      );
-      return;
-    }
-
-    const payload = {
-      user_id: userId,
-      latitude,
-      longitude,
-      description: data.descripcion
-    };
-
-    this.loading = true;
-
-    this.floodReportService.createReport(payload).subscribe({
-      next: () => {
-        this.loading = false;
-
-      this.presentToast(
-        'Reporte guardado. Está pendiente de aprobación.',
-        'success'
-      );
-    },
-    error: (error) => {
-        this.loading = false;
-        this.handleHttpError(error);
+    private handleReportFormResult(
+      data: FloodReportFormValue | null,
+      role?: string,
+      latitude?: number,
+      longitude?: number
+    ): void {
+      if (role !== 'submitted' || !data) {
+        return;
       }
-    });
-  }
+
+      const user = this.authService.currentUser;
+      const userId = Number(user?.id);
+
+      if (!Number.isInteger(userId) || userId <= 0) {
+        this.presentToast(
+          'No se pudo identificar tu usuario. Iniciá sesión nuevamente.',
+          'danger'
+        );
+        return;
+      }
+
+      if (
+        latitude === undefined ||
+        longitude === undefined ||
+        !Number.isFinite(latitude) ||
+        !Number.isFinite(longitude)
+      ) {
+        this.presentToast(
+          'No se pudieron obtener las coordenadas del reporte.',
+          'danger'
+        );
+        return;
+      }
+
+      const incidentLabels: Record<string, string> = {
+        calle_con_agua: 'Calle con agua',
+        calle_cortada: 'Calle cortada',
+        calle_erosionada: 'Calle erosionada o socavada',
+        agua_en_viviendas: 'Agua dentro de viviendas',
+        boca_tormenta_obstruida: 'Boca de tormenta obstruida',
+        canal_desbordado: 'Canal o zanja desbordada'
+      };
+
+      const waterDepthLabels: Record<string, string> = {
+        '0_5': '0 a 5 cm',
+        '5_20': '5 a 20 cm',
+        '20_50': '20 a 50 cm',
+        '50_100': '50 cm a 1 m',
+        mas_100: 'Más de 1 m'
+      };
+
+      const evacuationLabels: Record<string, string> = {
+        no: 'No',
+        autoevacuacion: 'Sí, nos autoevacuamos.',
+        evacuados_organismo:
+          'Sí, fuimos evacuados por bomberos, defensa civil u otro organismo.'
+      };
+
+      const workLabels: Record<string, string> = {
+        actividad_propia: 'No pude realizar mi actividad laboral propia.',
+        no_llego: 'No pude llegar a mi lugar de trabajo.',
+        perdidas_economicas: 'Se produjeron pérdidas económicas.'
+      };
+
+      const serviceLabels: Record<string, string> = {
+        sin_luz: 'Sin energía eléctrica.',
+        sin_agua: 'Sin agua potable.',
+        desborde_cloacal: 'Desborde cloacal.'
+      };
+
+      const assistanceLabels: Record<string, string> = {
+        limpieza: 'Limpieza y desinfección.',
+        colchones: 'Colchones o ropa de cama.',
+        alimentos: 'Alimentos.',
+        atencion_medica: 'Atención médica.'
+      };
+
+      const formData = new FormData();
+
+      formData.append('latitude', String(latitude));
+      formData.append('longitude', String(longitude));
+      formData.append('description', data.descripcion);
+
+      // Tipos de incidente seleccionados.
+      const incidentTypes = data.tipoIncidente
+        .map(key => incidentLabels[key])
+        .filter(Boolean);
+
+      if (incidentTypes.length > 0) {
+        formData.append('incident_type', incidentTypes.join(', '));
+      }
+
+      // Profundidad del agua.
+      if (data.rangoTirante) {
+        formData.append(
+          'water_depth_range',
+          waterDepthLabels[data.rangoTirante]
+        );
+      }
+
+      // Continuidad del problema.
+      if (data.problemaPresente !== null) {
+        formData.append(
+          'problem_persists',
+          String(data.problemaPresente === 'si')
+        );
+      }
+
+      // Evacuación.
+      formData.append(
+        'evacuation',
+        evacuationLabels[data.privado.evacuacion]
+      );
+
+      // Afectación laboral.
+      const workDetails = data.privado.trabajoDetalle
+        .map(key => workLabels[key])
+        .filter(Boolean);
+
+      const workAffected = data.privado.trabajoAfectado
+        ? workDetails.join(', ')
+        : 'No';
+
+      formData.append('work_affected', workAffected);
+
+      // Servicios afectados.
+      const affectedServices = data.privado.serviciosAfectados
+        .map(key => serviceLabels[key])
+        .filter(Boolean);
+
+      formData.append(
+        'services_affected',
+        JSON.stringify(affectedServices)
+      );
+
+      // Asistencia necesaria.
+      const neededAssistance = data.privado.asistenciaNecesaria
+        .map(key => assistanceLabels[key])
+        .filter(Boolean);
+
+      formData.append(
+        'assistance_needed',
+        JSON.stringify(neededAssistance)
+      );
+
+      // Fotografías.
+      data.fotografias?.forEach(foto => {
+        formData.append('fotografias', foto);
+      });
+
+      this.loading = true;
+
+      this.floodReportService.createReport(formData).subscribe({
+        next: response => {
+          this.loading = false;
+
+          console.log('REPORTE CREADO:', response);
+
+          this.presentToast(
+            'Reporte guardado. Está pendiente de aprobación.',
+            'success'
+          );
+        },
+        error: error => {
+          this.loading = false;
+          this.handleHttpError(error);
+        }
+      });
+    }
 
   private handleHttpError(error: any): void {
     let message = 'Ocurrió un error inesperado. Intentá nuevamente.';

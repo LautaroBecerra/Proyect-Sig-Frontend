@@ -24,8 +24,8 @@ export class FloodReportFormComponent implements OnInit {
 
   form!: FormGroup;
 
-  photoPreviewUrl: string | null = null;
-  private photoFile: File | null = null;
+  photoPreviewUrls: string[] = [];
+  private photoFiles: File[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -166,23 +166,45 @@ export class FloodReportFormComponent implements OnInit {
   // ---------- Fotografía ----------
   // Solo se maneja localmente (File + URL.createObjectURL para la
   // vista previa). No se sube a ningún lado todavía.
-
-  onPhotoSelected(event: Event): void {
+  onPhotosSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const file = input.files?.[0] ?? null;
-    this.setPhoto(file);
-  }
+    const files = Array.from(input.files ?? []);
 
-  removePhoto(): void {
-    this.setPhoto(null);
-  }
-
-  private setPhoto(file: File | null): void {
-    if (this.photoPreviewUrl) {
-      URL.revokeObjectURL(this.photoPreviewUrl);
+    if (this.photoFiles.length + files.length > 5) {
+      this.presentToast('Podés adjuntar un máximo de 5 fotografías.', 'warning');
+      input.value = '';
+      return;
     }
-    this.photoFile = file;
-    this.photoPreviewUrl = file ? URL.createObjectURL(file) : null;
+
+    const validTypes = ['image/jpeg', 'image/png', 'image/webp'];
+
+    for (const file of files) {
+      if (!validTypes.includes(file.type)) {
+        this.presentToast('Solo se permiten imágenes JPG, PNG o WEBP.', 'warning');
+        input.value = '';
+        return;
+      }
+
+      if (file.size > 5 * 1024 * 1024) {
+        this.presentToast('Cada fotografía puede pesar como máximo 5 MB.', 'warning');
+        input.value = '';
+        return;
+      }
+    }
+
+    this.photoFiles = [...this.photoFiles, ...files];
+
+    const newPreviews = files.map(file => URL.createObjectURL(file));
+    this.photoPreviewUrls = [...this.photoPreviewUrls, ...newPreviews];
+
+    input.value = '';
+  }
+
+removePhoto(index: number): void {
+    URL.revokeObjectURL(this.photoPreviewUrls[index]);
+
+    this.photoFiles.splice(index, 1);
+    this.photoPreviewUrls.splice(index, 1);
   }
 
   // ---------- Envío ----------
@@ -199,7 +221,7 @@ export class FloodReportFormComponent implements OnInit {
 
     const value: FloodReportFormValue = {
       ...this.form.value,
-      fotografia: this.photoFile
+      fotografias: this.photoFiles
     };
 
     // TODO: acá todavía NO se llama al backend. Cuando exista el endpoint
